@@ -13,7 +13,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-/*for authentication
+/*for authentication dfs
 =============================================================================
 */
 func GetLogin(session, userIP string) string {
