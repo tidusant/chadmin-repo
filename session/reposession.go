@@ -1,13 +1,13 @@
 package session
 
 import (
-	"c3m/apps/chadmin/models"
-	"c3m/apps/common"
-	"c3m/log"
-
-	"c3m/common/mystring"
 	"os"
 	"time"
+
+	"github.com/tidusant/c3m-common/c3mcommon"
+	"github.com/tidusant/c3m-common/log"
+	"github.com/tidusant/c3m-common/mystring"
+	"github.com/tidusant/chadmin-repo/models"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -20,7 +20,7 @@ var (
 func init() {
 	log.Infof("init reposession")
 	strErr := ""
-	db, strErr = common.ConnectDB("session")
+	db, strErr = c3mcommon.ConnectDB("session")
 	if strErr != "" {
 		log.Infof(strErr)
 		os.Exit(1)
@@ -31,7 +31,7 @@ func CreateSession() string {
 	sex := mystring.RandString(20)
 	col := db.C("sessions")
 	err := col.Insert(bson.M{"uid": sex, "created": time.Now().Unix(), "expired": time.Now().Unix() + 30*60})
-	if common.CheckError("Insert sessions", err) {
+	if c3mcommon.CheckError("Insert sessions", err) {
 		return sex
 	}
 	return "-1"
@@ -82,13 +82,13 @@ func CheckRequest(uri, useragent, referrer, remoteAddress, requestType string) b
 		}
 	}
 
-	if common.CheckError("checkRequest", err) {
+	if c3mcommon.CheckError("checkRequest", err) {
 		if urlcount == 0 {
 			//check ip in 3 sec
 			urlcount, err := col.Find(bson.M{"remoteAddress": remoteAddress, "created": bson.M{"$gt": int(time.Now().Unix()) - 1}}).Count()
 			if urlcount < 500 {
 				err = col.Insert(bson.M{"uri": uri, "created": int(time.Now().Unix()), "user-agent": useragent, "referer": referrer, "remoteAddress": remoteAddress})
-				common.CheckError("checkRequest Insert", err)
+				c3mcommon.CheckError("checkRequest Insert", err)
 				return true
 			} else {
 				log.Debugf("request ip limited %s", uri)

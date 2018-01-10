@@ -1,8 +1,8 @@
 package cuahang
 
 import (
-	"c3m/apps/chadmin/models"
-	"c3m/apps/common"
+	"github.com/tidusant/c3m-common/c3mcommon"
+	"github.com/tidusant/chadmin-repo/models"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -24,7 +24,7 @@ func SaveImages(images []models.CHImage) string {
 	bulk.Unordered()
 	bulk.Insert(imgfiles...)
 	_, bulkErr := bulk.Run()
-	common.CheckError("insert bulk", bulkErr)
+	c3mcommon.CheckError("insert bulk", bulkErr)
 
 	return "1"
 }
@@ -33,7 +33,7 @@ func ImageCount(shopid string) int {
 	col := db.C("files")
 	count := -1
 	count, err := col.Find(bson.M{"shopid": shopid, "appname": "chadmin"}).Count()
-	common.CheckError("image count error", err)
+	c3mcommon.CheckError("image count error", err)
 
 	return count
 }
@@ -46,7 +46,7 @@ func RemoveImage(shopid, userid, filename string) bool {
 	if image.Shopid == shopid && image.Filename == filename {
 		if userid == "1" || image.Uid == userid {
 			err = col.Remove(bson.M{"filename": filename, "shopid": shopid})
-			if common.CheckError("remove image", err) {
+			if c3mcommon.CheckError("remove image", err) {
 				return true
 			}
 		}
@@ -66,6 +66,6 @@ func GetImages(shopid, userid, album string) []models.CHImage {
 		cond = bson.M{"shopid": shopid, "albumname": album, "appname": "chadmin"}
 	}
 	err := col.Find(cond).All(&rs)
-	common.CheckError("error get images shopid:"+shopid+" userid:"+userid+" album:"+album, err)
+	c3mcommon.CheckError("error get images shopid:"+shopid+" userid:"+userid+" album:"+album, err)
 	return rs
 }

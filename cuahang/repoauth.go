@@ -1,11 +1,12 @@
 package cuahang
 
 import (
-	"c3m/apps/chadmin/models"
-	"c3m/apps/common"
-	"c3m/log"
 	"crypto/md5"
 	"encoding/hex"
+
+	"github.com/tidusant/c3m-common/c3mcommon"
+	"github.com/tidusant/c3m-common/log"
+	"github.com/tidusant/chadmin-repo/models"
 
 	"time"
 
@@ -65,7 +66,7 @@ func Login(user, pass, session, userIP string) string {
 		userlogin.Session = session
 
 		_, err := coluserlogin.UpsertId(userlogin.UserId, &userlogin)
-		common.CheckError("Upsert login", err)
+		c3mcommon.CheckError("Upsert login", err)
 		return result.Name
 	}
 	return ""

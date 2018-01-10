@@ -1,9 +1,10 @@
 package cuahang
 
 import (
-	"c3m/apps/common"
-	"c3m/log"
 	"os"
+
+	"github.com/tidusant/c3m-common/c3mcommon"
+	"github.com/tidusant/c3m-common/log"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -16,7 +17,7 @@ var (
 func init() {
 	log.Infof("init repo cuahang")
 	strErr := ""
-	db, strErr = common.ConnectDB("chadmin")
+	db, strErr = c3mcommon.ConnectDB("chadmin")
 	if strErr != "" {
 		log.Infof(strErr)
 		os.Exit(1)
@@ -42,6 +43,6 @@ func GetAllSlug(userid, shopid string) []string {
 		cond["userid"] = userid
 	}
 	err := col.Find(cond).Select(bson.M{"slug": 1}).All(&rs)
-	common.CheckError("getallslug", err)
+	c3mcommon.CheckError("getallslug", err)
 	return rs
 }

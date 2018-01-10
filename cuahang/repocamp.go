@@ -1,9 +1,10 @@
 package cuahang
 
 import (
-	"c3m/apps/chadmin/models"
-	"c3m/apps/common"
 	"time"
+
+	"github.com/tidusant/c3m-common/c3mcommon"
+	"github.com/tidusant/chadmin-repo/models"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -13,7 +14,7 @@ func GetAllCampaigns(shopid string) []models.Campaign {
 	var rs []models.Campaign
 	cond := bson.M{"shopid": shopid}
 	err := col.Find(cond).All(&rs)
-	common.CheckError("Getall campaign", err)
+	c3mcommon.CheckError("Getall campaign", err)
 	return rs
 }
 
@@ -22,7 +23,7 @@ func GetCampaignsByRange(shopid string, start time.Time, end time.Time) []models
 	var rs []models.Campaign
 	cond := bson.M{"shopid": shopid, "start": bson.M{"$lt": end}, "end": bson.M{"$gt": start}}
 	err := col.Find(cond).All(&rs)
-	common.CheckError("Getall campaign by range", err)
+	c3mcommon.CheckError("Getall campaign by range", err)
 	return rs
 }
 
@@ -31,7 +32,7 @@ func GetCampaignByID(shopid, ID string) models.Campaign {
 	var rs models.Campaign
 	cond := bson.M{"shopid": shopid, "_id": bson.ObjectIdHex(ID)}
 	err := col.Find(cond).One(&rs)
-	common.CheckError("Get campaign by id", err)
+	c3mcommon.CheckError("Get campaign by id", err)
 	return rs
 }
 func GetOrderStatusMap(shopid string) map[string]models.OrderStatus {
@@ -56,7 +57,7 @@ func GetCampaignDetailByID(shopid string, camp models.Campaign) models.Campaign 
 	for _, stat := range stats {
 		statsmap[stat.ID.Hex()] = stat
 	}
-	if common.CheckError("Get detail campaign by id", err) {
+	if c3mcommon.CheckError("Get detail campaign by id", err) {
 
 		for _, ord := range ords {
 			var detail models.CampaignStatusDetail
@@ -96,6 +97,6 @@ func SaveCampaign(camp models.Campaign) models.Campaign {
 func DeleteCampaign(camp models.Campaign) bool {
 	col := db.C("addons_campaigns")
 	err := col.Remove(camp)
-	return common.CheckError("Delete campaign", err)
+	return c3mcommon.CheckError("Delete campaign", err)
 
 }

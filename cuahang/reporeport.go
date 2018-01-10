@@ -1,10 +1,11 @@
 package cuahang
 
 import (
-	"c3m/apps/chadmin/models"
-	"c3m/apps/common"
-	"c3m/log"
 	"time"
+
+	"github.com/tidusant/c3m-common/c3mcommon"
+	"github.com/tidusant/c3m-common/log"
+	"github.com/tidusant/chadmin-repo/models"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -40,7 +41,7 @@ func GetOrdersReportByRange(shopid string, start time.Time, end time.Time) model
 	for _, stat := range stats {
 		statsmap[stat.ID.Hex()] = stat
 	}
-	if common.CheckError("GetOrdersReportByRange", err) {
+	if c3mcommon.CheckError("GetOrdersReportByRange", err) {
 		for _, ord := range ords {
 			var detail models.CampaignStatusDetail
 			if val, ok := statusdetails[ord.Status]; ok {

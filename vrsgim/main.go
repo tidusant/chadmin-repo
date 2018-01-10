@@ -1,9 +1,10 @@
 package cuahang
 
 import (
-	"c3m/apps/common"
-	"c3m/log"
 	"os"
+
+	"github.com/tidusant/c3m-common/c3mcommon"
+	"github.com/tidusant/c3m-common/log"
 
 	"gopkg.in/mgo.v2"
 )
@@ -15,7 +16,7 @@ var (
 func init() {
 	log.Infof("init repo vrsgim")
 	strErr := ""
-	db, strErr = common.ConnectDB("vrsgim")
+	db, strErr = c3mcommon.ConnectDB("vrsgim")
 	if strErr != "" {
 		log.Infof(strErr)
 		os.Exit(1)

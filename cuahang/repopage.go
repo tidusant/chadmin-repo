@@ -1,10 +1,11 @@
 package cuahang
 
 import (
-	"c3m/apps/chadmin/models"
-	"c3m/apps/common"
-	"c3m/log"
 	"encoding/json"
+
+	"github.com/tidusant/c3m-common/c3mcommon"
+	"github.com/tidusant/c3m-common/log"
+	"github.com/tidusant/chadmin-repo/models"
 	//	"c3m/log"
 
 	//"strings"
@@ -20,7 +21,7 @@ func SavePage(newitem models.Page) string {
 	// if prod.Code {
 
 	// 	err := col.Insert(prod)
-	// 	common.CheckError("product Insert", err)
+	// 	c3mcommon.CheckError("product Insert", err)
 	// } else {
 
 	if len(newitem.Langs) > 0 {
@@ -65,7 +66,7 @@ func SavePage(newitem models.Page) string {
 		}
 
 		_, err := col.UpsertId(newitem.ID, &newitem)
-		common.CheckError("news Update", err)
+		c3mcommon.CheckError("news Update", err)
 	} else {
 		col.RemoveId(newitem.ID)
 	}
@@ -82,7 +83,7 @@ func GetAllPage(userid, shopid string) []models.Page {
 	var rs []models.Page
 	shop := GetShopById(userid, shopid)
 	err := col.Find(bson.M{"shopid": shop.ID.Hex(), "publish": true}).All(&rs)
-	common.CheckError("get all page", err)
+	c3mcommon.CheckError("get all page", err)
 	return rs
 }
 func GetPageByCode(userid, shopid, code string) models.Page {
@@ -93,6 +94,6 @@ func GetPageByCode(userid, shopid, code string) models.Page {
 		cond["userid"] = userid
 	}
 	err := col.Find(cond).One(&rs)
-	common.CheckError("getcatbycode", err)
+	c3mcommon.CheckError("getcatbycode", err)
 	return rs
 }

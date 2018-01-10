@@ -1,8 +1,9 @@
 package builder
 
 import (
-	"c3m/apps/chadmin/repo/models"
 	"time"
+
+	"github.com/tidusant/chadmin-repo/models"
 
 	"os"
 

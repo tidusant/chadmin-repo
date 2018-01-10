@@ -1,18 +1,20 @@
 package cuahang
 
 import (
-	"c3m/apps/chadmin/models"
-	"c3m/apps/common"
 	"time"
+
+	"github.com/tidusant/c3m-common/c3mcommon"
+	"github.com/tidusant/chadmin-repo/models"
 
 	"gopkg.in/mgo.v2/bson"
 )
+
 func CountOrderByCus(phone, shopid string) int {
 	col := db.C("addons_orders")
-	rs:=0
+	rs := 0
 	cond := bson.M{"shopid": shopid, "phone": phone}
 	rs, err := col.Find(cond).Count()
-	common.CheckError("count order cus by phone", err)
+	c3mcommon.CheckError("count order cus by phone", err)
 	return rs
 }
 func GetCusByPhone(phone, shopid string) models.Customer {
@@ -20,7 +22,7 @@ func GetCusByPhone(phone, shopid string) models.Customer {
 	var rs models.Customer
 	cond := bson.M{"shopid": shopid, "phone": phone}
 	err := col.Find(cond).One(&rs)
-	common.CheckError("get cus by phone", err)
+	c3mcommon.CheckError("get cus by phone", err)
 	return rs
 }
 func GetCusByEmail(email, shopid string) models.Customer {
@@ -28,7 +30,7 @@ func GetCusByEmail(email, shopid string) models.Customer {
 	var rs models.Customer
 	cond := bson.M{"shopid": shopid, "email": email}
 	err := col.Find(cond).One(&rs)
-	common.CheckError("get cus by email", err)
+	c3mcommon.CheckError("get cus by email", err)
 	return rs
 }
 func SaveCus(cus models.Customer) bool {
@@ -39,7 +41,7 @@ func SaveCus(cus models.Customer) bool {
 		cus.Created = cus.Modified
 	}
 	_, err := col.UpsertId(cus.ID, &cus)
-	if common.CheckError("save cus ", err) {
+	if c3mcommon.CheckError("save cus ", err) {
 		return true
 	}
 	return false

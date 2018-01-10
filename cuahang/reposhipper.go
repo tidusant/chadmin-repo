@@ -1,9 +1,10 @@
 package cuahang
 
 import (
-	"c3m/apps/chadmin/models"
-	"c3m/apps/common"
 	"time"
+
+	"github.com/tidusant/c3m-common/c3mcommon"
+	"github.com/tidusant/chadmin-repo/models"
 
 	"gopkg.in/mgo.v2/bson"
 )
@@ -13,7 +14,7 @@ func GetAllShipper(shopid string) []models.Shipper {
 	var rs []models.Shipper
 	cond := bson.M{"shopid": shopid}
 	err := col.Find(cond).All(&rs)
-	common.CheckError("GetAllShipper", err)
+	c3mcommon.CheckError("GetAllShipper", err)
 	return rs
 }
 func GetShipperByID(itemid, shopid string) models.Shipper {
@@ -21,7 +22,7 @@ func GetShipperByID(itemid, shopid string) models.Shipper {
 	var rs models.Shipper
 	cond := bson.M{"shopid": shopid, "_id": bson.ObjectIdHex(itemid)}
 	err := col.Find(cond).One(&rs)
-	common.CheckError("GetShipperByID", err)
+	c3mcommon.CheckError("GetShipperByID", err)
 	return rs
 }
 
@@ -30,7 +31,7 @@ func GetDefaultShipper(shopid string) models.Shipper {
 	var rs models.Shipper
 	cond := bson.M{"shopid": shopid, "default": true}
 	err := col.Find(cond).One(&rs)
-	common.CheckError("GetDefaultShipper", err)
+	c3mcommon.CheckError("GetDefaultShipper", err)
 	return rs
 }
 
@@ -43,7 +44,7 @@ func SaveShipper(shipper models.Shipper) models.Shipper {
 
 	shipper.Modified = shipper.Created
 	_, err := col.UpsertId(shipper.ID, shipper)
-	common.CheckError("SaveShipper", err)
+	c3mcommon.CheckError("SaveShipper", err)
 	return shipper
 }
 
@@ -52,7 +53,7 @@ func GetCountOrderByShipper(shipper models.Shipper) int {
 
 	cond := bson.M{"shopid": shipper.ShopId, "shipperid": shipper.ID.Hex()}
 	n, err := col.Find(cond).Count()
-	common.CheckError("GetCountOrderByShipper", err)
+	c3mcommon.CheckError("GetCountOrderByShipper", err)
 	return n
 }
 
@@ -61,7 +62,7 @@ func DeleteShipper(shipper models.Shipper) bool {
 
 	cond := bson.M{"shopid": shipper.ShopId, "_id": shipper.ID}
 	err := col.Remove(cond)
-	return common.CheckError("DeleteShipper", err)
+	return c3mcommon.CheckError("DeleteShipper", err)
 
 }
 
@@ -71,6 +72,6 @@ func UnSetShipperDefault(shopid string) {
 	cond := bson.M{"shopid": shopid, "default": true}
 	change := bson.M{"$set": bson.M{"default": false}}
 	err := col.Update(cond, change)
-	common.CheckError("UnSetShipperDefault", err)
+	c3mcommon.CheckError("UnSetShipperDefault", err)
 
 }

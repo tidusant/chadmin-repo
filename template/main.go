@@ -1,11 +1,11 @@
 package template
 
 import (
-	"c3m/apps/common"
-
-	"c3m/apps/tempman/portal/models"
-	"c3m/log"
 	"os"
+
+	"github.com/tidusant/c3m-common/c3mcommon"
+	"github.com/tidusant/c3m-common/log"
+	"github.com/tidusant/chadmin-repo/models"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -18,7 +18,7 @@ var (
 func init() {
 	log.Infof("init repo template")
 	strErr := ""
-	db, strErr = common.ConnectDB("chtemplate")
+	db, strErr = c3mcommon.ConnectDB("chtemplate")
 	if strErr != "" {
 		log.Infof(strErr)
 		os.Exit(1)
@@ -54,7 +54,7 @@ func InstallTemplate(userid, shopid string, template models.Template) string {
 	cond := bson.M{"status": 1, "code": template.Code}
 	change := bson.M{"$set": bson.M{"installedid": template.InstalledIDs}}
 	err := col.Update(cond, change)
-	if common.CheckError("install template", err) {
+	if c3mcommon.CheckError("install template", err) {
 		return template.Code
 	}
 	return ""
@@ -64,7 +64,7 @@ func GetAllTemplates(userid, shopid string) []models.Template {
 	col := db.C("templates")
 	var rs []models.Template
 	err := col.Find(bson.M{"status": 1, "installedid": bson.M{"$ne": shopid}}).Select(bson.M{"code": 1, "title": 1, "screenshot": 1}).All(&rs)
-	common.CheckError("get all templates", err)
+	c3mcommon.CheckError("get all templates", err)
 	return rs
 }
 
@@ -75,7 +75,7 @@ func GetTemplateByCode(userid, shopid, code string) models.Template {
 	}
 	col := db.C("templates")
 	err := col.Find(bson.M{"status": 1, "code": code}).One(&rs)
-	common.CheckError("get template", err)
+	c3mcommon.CheckError("get template", err)
 	return rs
 }
 
@@ -83,6 +83,6 @@ func GetAllTemplatesInstalled(userid, shopid string) []models.Template {
 	col := db.C("templates")
 	var rs []models.Template
 	err := col.Find(bson.M{"status": 1, "installedid": shopid}).Select(bson.M{"code": 1, "title": 1, "screenshot": 1}).All(&rs)
-	common.CheckError("get all templates", err)
+	c3mcommon.CheckError("get all templates", err)
 	return rs
 }

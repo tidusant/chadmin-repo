@@ -1,8 +1,9 @@
 package cuahang
 
 import (
-	"c3m/apps/chadmin/models"
-	"c3m/apps/common"
+	"github.com/tidusant/c3m-common/c3mcommon"
+	"github.com/tidusant/c3m-common/log"
+	"github.com/tidusant/chadmin-repo/models"
 
 	"github.com/spf13/viper"
 	//"c3m/apps/common"
@@ -23,7 +24,7 @@ func UpdateTheme(userid, shopid, code string) string {
 		log.Debugf("update login info:shopid %s", shop.ID.Hex())
 		change := bson.M{"$set": bson.M{"theme": code}}
 		err := col.UpdateId(shop.ID, change)
-		common.CheckError("update theme", err)
+		c3mcommon.CheckError("update theme", err)
 	}
 	return shop.Name
 }

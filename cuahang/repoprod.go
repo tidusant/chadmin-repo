@@ -1,8 +1,8 @@
 package cuahang
 
 import (
-	"c3m/apps/chadmin/models"
-	"c3m/apps/common"
+	"github.com/tidusant/c3m-common/c3mcommon"
+	"github.com/tidusant/chadmin-repo/models"
 	//	"c3m/log"
 
 	//"strings"
@@ -18,14 +18,14 @@ func SaveProd(prod models.Product) string {
 	// if prod.Code {
 
 	// 	err := col.Insert(prod)
-	// 	common.CheckError("product Insert", err)
+	// 	c3mcommon.CheckError("product Insert", err)
 	// } else {
 	if len(prod.Langs) > 0 {
 		if prod.ID == "" {
 			prod.ID = bson.NewObjectId()
 		}
 		_, err := col.UpsertId(prod.ID, &prod)
-		common.CheckError("product Update", err)
+		c3mcommon.CheckError("product Update", err)
 	} else {
 		col.RemoveId(prod.ID)
 	}
@@ -38,7 +38,7 @@ func GetAllProds(userid, shopid string) []models.Product {
 	var rs []models.Product
 	shop := GetShopById(userid, shopid)
 	err := col.Find(bson.M{"shopid": shop.ID.Hex()}).All(&rs)
-	common.CheckError("getprod", err)
+	c3mcommon.CheckError("getprod", err)
 	return rs
 }
 func GetDemoProds() []models.Product {
@@ -46,7 +46,7 @@ func GetDemoProds() []models.Product {
 	var rs []models.Product
 	shop := GetDemoShop()
 	err := col.Find(bson.M{"shopid": shop.ID.Hex()}).All(&rs)
-	common.CheckError("get demo prod", err)
+	c3mcommon.CheckError("get demo prod", err)
 	return rs
 }
 func GetProdBySlug(userid, shopid, slug string) models.Product {
@@ -57,7 +57,7 @@ func GetProdBySlug(userid, shopid, slug string) models.Product {
 		cond["userid"] = userid
 	}
 	err := col.Find(cond).One(&rs)
-	common.CheckError("getprod", err)
+	c3mcommon.CheckError("getprod", err)
 	return rs
 }
 func GetProdByCode(userid, shopid, code string) models.Product {
@@ -68,7 +68,7 @@ func GetProdByCode(userid, shopid, code string) models.Product {
 		cond["userid"] = userid
 	}
 	err := col.Find(cond).One(&rs)
-	common.CheckError("getprod", err)
+	c3mcommon.CheckError("getprod", err)
 	return rs
 }
 
@@ -80,7 +80,7 @@ func GetProdsByCatId(userid, shopid, catcode string) []models.Product {
 		cond["userid"] = userid
 	}
 	err := col.Find(cond).All(&rs)
-	common.CheckError("getprod", err)
+	c3mcommon.CheckError("getprod", err)
 
 	return rs
 
@@ -112,7 +112,7 @@ func GetAllCats(userid, shopid string) []models.ProdCat {
 		cond["userid"] = userid
 	}
 	err := col.Find(cond).All(&rs)
-	common.CheckError("getcatprod", err)
+	c3mcommon.CheckError("getcatprod", err)
 	return rs
 }
 
@@ -121,7 +121,7 @@ func GetDemoProdCats() []models.ProdCat {
 	shop := GetDemoShop()
 	var rs []models.ProdCat
 	err := col.Find(bson.M{"shopid": shop.ID.Hex()}).All(&rs)
-	common.CheckError("getcatprod", err)
+	c3mcommon.CheckError("getcatprod", err)
 	return rs
 }
 func GetCatByCode(userid, shopid, code string) models.ProdCat {
@@ -132,6 +132,6 @@ func GetCatByCode(userid, shopid, code string) models.ProdCat {
 		cond["userid"] = userid
 	}
 	err := col.Find(cond).One(&rs)
-	common.CheckError("getcatbycode", err)
+	c3mcommon.CheckError("getcatbycode", err)
 	return rs
 }

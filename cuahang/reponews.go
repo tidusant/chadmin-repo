@@ -1,8 +1,8 @@
 package cuahang
 
 import (
-	"c3m/apps/chadmin/models"
-	"c3m/apps/common"
+	"github.com/tidusant/c3m-common/c3mcommon"
+	"github.com/tidusant/chadmin-repo/models"
 	//	"c3m/log"
 
 	//"strings"
@@ -18,14 +18,14 @@ func SaveNews(newitem models.News) string {
 	// if prod.Code {
 
 	// 	err := col.Insert(prod)
-	// 	common.CheckError("product Insert", err)
+	// 	c3mcommon.CheckError("product Insert", err)
 	// } else {
 	if len(newitem.Langs) > 0 {
 		if newitem.ID == "" {
 			newitem.ID = bson.NewObjectId()
 		}
 		_, err := col.UpsertId(newitem.ID, &newitem)
-		common.CheckError("news Update", err)
+		c3mcommon.CheckError("news Update", err)
 	} else {
 		col.RemoveId(newitem.ID)
 	}
@@ -41,7 +41,7 @@ func GetAllNews(userid, shopid string) []models.News {
 	var rs []models.News
 	shop := GetShopById(userid, shopid)
 	err := col.Find(bson.M{"shopid": shop.ID.Hex()}).All(&rs)
-	common.CheckError("get all news", err)
+	c3mcommon.CheckError("get all news", err)
 	return rs
 }
 func GetDemoNews() []models.News {
@@ -49,7 +49,7 @@ func GetDemoNews() []models.News {
 	var rs []models.News
 	shop := GetDemoShop()
 	err := col.Find(bson.M{"shopid": shop.ID.Hex()}).All(&rs)
-	common.CheckError("get all demo news", err)
+	c3mcommon.CheckError("get all demo news", err)
 	return rs
 }
 
@@ -61,7 +61,7 @@ func GetNewsByCode(userid, shopid, code string) models.News {
 		cond["userid"] = userid
 	}
 	err := col.Find(cond).One(&rs)
-	common.CheckError("getnewbycode", err)
+	c3mcommon.CheckError("getnewbycode", err)
 
 	return rs
 
@@ -71,7 +71,7 @@ func GetNewsByCatId(userid, shopid, catcode string) []models.Product {
 	var rs []models.Product
 
 	err := col.Find(bson.M{"userid": userid, "shopid": shopid, "catid": catcode}).All(&rs)
-	common.CheckError("getprod", err)
+	c3mcommon.CheckError("getprod", err)
 
 	return rs
 
@@ -96,7 +96,7 @@ func GetDemoNewsCats() []models.NewsCat {
 	shop := GetDemoShop()
 	var rs []models.NewsCat
 	err := col.Find(bson.M{"shopid": shop.ID.Hex()}).All(&rs)
-	common.CheckError("getcatprod", err)
+	c3mcommon.CheckError("getcatprod", err)
 	return rs
 }
 func GetAllNewsCats(userid, shopid string) []models.NewsCat {
@@ -107,7 +107,7 @@ func GetAllNewsCats(userid, shopid string) []models.NewsCat {
 		cond["userid"] = userid
 	}
 	err := col.Find(cond).Sort("-created").All(&rs)
-	common.CheckError("getcat ", err)
+	c3mcommon.CheckError("getcat ", err)
 	return rs
 }
 
@@ -115,6 +115,6 @@ func GetNewsCatByCode(userid, shopid, code string) models.NewsCat {
 	col := db.C("addons_newscats")
 	var rs models.NewsCat
 	err := col.Find(bson.M{"shopid": shopid, "code": code}).One(&rs)
-	common.CheckError("getcatbycode", err)
+	c3mcommon.CheckError("getcatbycode", err)
 	return rs
 }

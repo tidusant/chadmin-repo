@@ -1,10 +1,11 @@
 package cuahang
 
 import (
-	"c3m/apps/chadmin/models"
-	"c3m/apps/common"
-	"c3m/common/inflect"
-	"c3m/log"
+	"github.com/tidusant/c3m-common/c3mcommon"
+	"github.com/tidusant/c3m-common/inflect"
+	"github.com/tidusant/c3m-common/log"
+	"github.com/tidusant/chadmin-repo/models"
+
 	"strings"
 	"time"
 
@@ -16,7 +17,7 @@ func GetOrderByID(orderid, shopid string) models.Order {
 	var rs models.Order
 	cond := bson.M{"shopid": shopid, "_id": bson.ObjectIdHex(orderid)}
 	err := col.Find(cond).One(&rs)
-	common.CheckError("GetOrdersByID", err)
+	c3mcommon.CheckError("GetOrdersByID", err)
 	return rs
 }
 
@@ -63,7 +64,7 @@ func GetOrdersByStatus(shopid, status string, page int, pagesize int, searchterm
 	} else {
 		err = col.Find(cond).Sort("_id").Skip((page - 1) * pagesize).Limit(pagesize).All(&rs)
 	}
-	common.CheckError("GetOrdersByStatus", err)
+	c3mcommon.CheckError("GetOrdersByStatus", err)
 	return rs
 }
 func CountOrdersByStatus(shopid, status, searchterm string) int {
@@ -87,7 +88,7 @@ func CountOrdersByStatus(shopid, status, searchterm string) int {
 
 	count, err := col.Find(cond).Count()
 	log.Debugf("count search: %v", count)
-	common.CheckError("CountOrdersByStatus", err)
+	c3mcommon.CheckError("CountOrdersByStatus", err)
 	return count
 }
 func GetOrdersByCampaign(camp models.Campaign) []models.Order {
@@ -95,7 +96,7 @@ func GetOrdersByCampaign(camp models.Campaign) []models.Order {
 	var rs []models.Order
 	cond := bson.M{"shopid": camp.ShopId}
 	err := col.Find(cond).All(&rs)
-	common.CheckError("GetOrdersByCamp", err)
+	c3mcommon.CheckError("GetOrdersByCamp", err)
 	return rs
 }
 
@@ -105,7 +106,7 @@ func GetDefaultOrderStatus(shopid string) models.OrderStatus {
 
 	cond := bson.M{"shopid": shopid, "default": true}
 	err := col.Find(cond).One(&rs)
-	common.CheckError("GetDefaultOrderStatus", err)
+	c3mcommon.CheckError("GetDefaultOrderStatus", err)
 	return rs
 }
 
@@ -118,7 +119,7 @@ func UpdateOrderStatus(shopid, status string, orderid []string) {
 	cond := bson.M{"_id": bson.M{"$in": arrIdObj}, "shopid": shopid}
 	change := bson.M{"$set": bson.M{"status": status}}
 	err := col.Update(cond, change)
-	common.CheckError("Update order status", err)
+	c3mcommon.CheckError("Update order status", err)
 	return
 }
 
@@ -139,7 +140,7 @@ func GetCountOrderByStatus(stat models.OrderStatus) int {
 
 	cond := bson.M{"shopid": stat.ShopId, "status": stat.ID.Hex()}
 	n, err := col.Find(cond).Count()
-	common.CheckError("GetstatusByID", err)
+	c3mcommon.CheckError("GetstatusByID", err)
 	return n
 }
 
@@ -149,7 +150,7 @@ func GetAllOrderStatus(shopid string) []models.OrderStatus {
 	var rs []models.OrderStatus
 	cond := bson.M{"shopid": shopid}
 	err := col.Find(cond).All(&rs)
-	common.CheckError("GetAllOrderStatus", err)
+	c3mcommon.CheckError("GetAllOrderStatus", err)
 	return rs
 }
 func SaveOrderStatus(status models.OrderStatus) models.OrderStatus {
@@ -169,7 +170,7 @@ func GetStatusByID(statusid, shopid string) models.OrderStatus {
 	var rs models.OrderStatus
 	cond := bson.M{"shopid": shopid, "_id": bson.ObjectIdHex(statusid)}
 	err := col.Find(cond).One(&rs)
-	common.CheckError("GetstatusByID", err)
+	c3mcommon.CheckError("GetstatusByID", err)
 	return rs
 }
 
@@ -178,7 +179,7 @@ func DeleteOrderStatus(stat models.OrderStatus) bool {
 
 	cond := bson.M{"shopid": stat.ShopId, "_id": stat.ID}
 	err := col.Remove(cond)
-	return common.CheckError("GetstatusByID", err)
+	return c3mcommon.CheckError("GetstatusByID", err)
 
 }
 
@@ -188,6 +189,6 @@ func UnSetStatusDefault(shopid string) {
 	cond := bson.M{"shopid": shopid, "default": true}
 	change := bson.M{"$set": bson.M{"default": false}}
 	err := col.Update(cond, change)
-	common.CheckError("GetstatusByDefault", err)
+	c3mcommon.CheckError("GetstatusByDefault", err)
 
 }
