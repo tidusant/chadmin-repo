@@ -1,12 +1,13 @@
 package builder
 
 import (
-	"c3m/apps/common"
+	"c3m/apps/chadmin/repo/models"
 	"time"
 
-	"c3m/apps/chadmin/models"
-	"c3m/log"
 	"os"
+
+	"github.com/tidusant/c3m-common/c3mcommon"
+	"github.com/tidusant/c3m-common/log"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -19,7 +20,7 @@ var (
 func init() {
 	log.Infof("init repo build")
 	strErr := ""
-	db, strErr = common.ConnectDB("chbuild")
+	db, strErr = c3mcommon.ConnectDB("chbuild")
 	if strErr != "" {
 		log.Infof(strErr)
 		os.Exit(1)
@@ -42,7 +43,7 @@ func CreateBuild(bs models.BuildScript) string {
 	bs.Created = time.Now().Unix()
 	bs.Modified = time.Now().Unix()
 	err = col.Insert(bs)
-	common.CheckError("insert build script", err)
+	c3mcommon.CheckError("insert build script", err)
 	if bs.ObjectID != "home" {
 		bs.ObjectID = "home"
 		CreateBuild(bs)
@@ -59,7 +60,7 @@ func GetBuild() models.BuildScript {
 		ReturnNew: true,
 	}
 	_, err := col.Find(bson.M{"status": 0}).Apply(change, &bs)
-	common.CheckError("GetBuild script", err)
+	c3mcommon.CheckError("GetBuild script", err)
 	return bs
 
 }
@@ -69,6 +70,6 @@ func RemoveBuild(shopID string) string {
 	cond := bson.M{"status": 0, "shopid": shopID}
 
 	_, err := col.RemoveAll(cond)
-	common.CheckError("insert build script", err)
+	c3mcommon.CheckError("insert build script", err)
 	return ""
 }
