@@ -8,8 +8,6 @@ import (
 	"github.com/spf13/viper"
 	//"c3m/apps/common"
 
-	"c3m/log"
-
 	"gopkg.in/mgo.v2/bson"
 )
 
