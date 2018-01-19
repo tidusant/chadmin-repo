@@ -108,9 +108,7 @@ func GetAllCats(userid, shopid string) []models.ProdCat {
 	col := db.C("addons_prodcats")
 	var rs []models.ProdCat
 	cond := bson.M{"shopid": shopid}
-	if userid != "594f665df54c58a2udfl54d3er" {
-		cond["userid"] = userid
-	}
+
 	err := col.Find(cond).All(&rs)
 	c3mcommon.CheckError("getcatprod", err)
 	return rs

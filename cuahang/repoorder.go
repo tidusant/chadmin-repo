@@ -60,9 +60,9 @@ func GetOrdersByStatus(shopid, status string, page int, pagesize int, searchterm
 
 	var err error
 	if page == 0 {
-		err = col.Find(cond).Sort("_id").All(&rs)
+		err = col.Find(cond).Sort("-_id").All(&rs)
 	} else {
-		err = col.Find(cond).Sort("_id").Skip((page - 1) * pagesize).Limit(pagesize).All(&rs)
+		err = col.Find(cond).Sort("-_id").Skip((page - 1) * pagesize).Limit(pagesize).All(&rs)
 	}
 	c3mcommon.CheckError("GetOrdersByStatus", err)
 	return rs
