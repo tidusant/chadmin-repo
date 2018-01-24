@@ -49,36 +49,30 @@ func GetDemoProds() []models.Product {
 	c3mcommon.CheckError("get demo prod", err)
 	return rs
 }
-func GetProdBySlug(userid, shopid, slug string) models.Product {
+func GetProdBySlug(shopid, slug string) models.Product {
 	col := db.C("addons_products")
 	var rs models.Product
 	cond := bson.M{"shopid": shopid, "slug": slug}
-	if userid != "594f665df545c58a2builder" {
-		cond["userid"] = userid
-	}
+
 	err := col.Find(cond).One(&rs)
 	c3mcommon.CheckError("getprod", err)
 	return rs
 }
-func GetProdByCode(userid, shopid, code string) models.Product {
+func GetProdByCode(shopid, code string) models.Product {
 	col := db.C("addons_products")
 	var rs models.Product
 	cond := bson.M{"shopid": shopid, "code": code}
-	if userid != "594f665df54c58a2udfl54d3er" {
-		cond["userid"] = userid
-	}
+
 	err := col.Find(cond).One(&rs)
 	c3mcommon.CheckError("getprod", err)
 	return rs
 }
 
-func GetProdsByCatId(userid, shopid, catcode string) []models.Product {
+func GetProdsByCatId(shopid, catcode string) []models.Product {
 	col := db.C("addons_products")
 	var rs []models.Product
 	cond := bson.M{"shopid": shopid, "catid": catcode}
-	if userid != "594f665df54c58a2udfl54d3er" {
-		cond["userid"] = userid
-	}
+
 	err := col.Find(cond).All(&rs)
 	c3mcommon.CheckError("getprod", err)
 
@@ -122,13 +116,11 @@ func GetDemoProdCats() []models.ProdCat {
 	c3mcommon.CheckError("getcatprod", err)
 	return rs
 }
-func GetCatByCode(userid, shopid, code string) models.ProdCat {
+func GetCatByCode(shopid, code string) models.ProdCat {
 	col := db.C("addons_prodcats")
 	var rs models.ProdCat
 	cond := bson.M{"shopid": shopid, "code": code}
-	if userid != "594f665df54c58a2udfl54d3er" {
-		cond["userid"] = userid
-	}
+
 	err := col.Find(cond).One(&rs)
 	c3mcommon.CheckError("getcatbycode", err)
 	return rs
