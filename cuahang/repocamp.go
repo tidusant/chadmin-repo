@@ -71,12 +71,13 @@ func GetCampaignDetailByID(shopid string, camp models.Campaign) models.Campaign 
 			detail.ShipFee += ord.ShipFee
 			detail.Noo++
 			rs[ord.Status] = detail
-			camp.Noo++
+
 			if statsmap[ord.Status].Finish {
 				camp.Base += ord.BaseTotal
 				camp.Total += ord.Total
 				camp.PartnerShipFee += ord.PartnerShipFee
 				camp.ShipFee += ord.ShipFee
+				camp.Noo++
 			}
 		}
 		camp.StatusDetail = rs
