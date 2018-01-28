@@ -33,6 +33,12 @@ type ShopConfigs struct {
 	ShipFee     int    `bson:"shipfee"`
 	FreeShip    int    `bson:"freeship"`
 	Avatar      string `bson:"avatar"`
+	FBPageId    string `bson:"fbpageid"`
+	GHTKToken   string `bson:"ghtktoken"`
+	Tel         string `bson:"tel"`
+	Address     string `bson:"address"`
+	Province    string `bson:"province"`
+	District    string `bson:"district"`
 
 	Userdomain  bool   `bson:"userdomain"`
 	Domain      string `bson:"domain"`
