@@ -9,6 +9,7 @@ type Whook struct {
 
 	Name    string `bson:"name"`
 	Action  string `bson:"action"`
+	ShopID  string `bson:"shopid"`
 	Created int    `bson:"created"`
 	Data    string `bson:"data"`
 	Status  int32  `bson:"status"`
