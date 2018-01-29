@@ -10,8 +10,9 @@ type Order struct {
 	ID             bson.ObjectId `bson:"_id,omitempty"`
 	ShopId         string        `bson:"shopid"`
 	CampaignId     string        `bson:"campaignid"`
-	ShipperId      string        `bson:"shipperid"`
-	ShipmentCode   string        `bson:"shipmentcode"`
+	CampaignName   string
+	ShipperId      string `bson:"shipperid"`
+	ShipmentCode   string `bson:"shipmentcode"`
 	Name           string
 	Phone          string `bson:"phone"`
 	OrderCount     int
