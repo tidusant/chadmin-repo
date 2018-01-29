@@ -35,10 +35,12 @@ type ShopConfigs struct {
 	Avatar      string `bson:"avatar"`
 	FBPageId    string `bson:"fbpageid"`
 	GHTKToken   string `bson:"ghtktoken"`
+	GHTKWareID  string `bson:"ghtkwareid"`
 	Tel         string `bson:"tel"`
 	Address     string `bson:"address"`
 	Province    string `bson:"province"`
 	District    string `bson:"district"`
+	Ward        string `bson:"ward"`
 
 	Userdomain  bool   `bson:"userdomain"`
 	Domain      string `bson:"domain"`
