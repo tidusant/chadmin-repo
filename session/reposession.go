@@ -68,35 +68,21 @@ func CheckRequest(uri, useragent, referrer, remoteAddress, requestType string) b
 
 	col := db.C("requestUrls")
 	log.Printf("now: %d , check: %d", int(time.Now().Unix()), int(time.Now().Unix())-10)
-	urlcount := -1
-	var err error
-	if requestType == "POST" {
-		urlcount, err = col.Find(bson.M{"uri": uri}).Count()
+
+	urlcount, _ := col.Find(bson.M{"uri": uri, "created": bson.M{"$gt": int(time.Now().Unix()) - 1}}).Count()
+	if urlcount < 50 {
+		log.Debugf("same url count %d", urlcount)
+		//check ip in 3 sec
+		urlcount, err := col.Find(bson.M{"remoteAddress": remoteAddress, "created": bson.M{"$gt": int(time.Now().Unix()) - 3}}).Count()
+		if urlcount < 500 {
+			err = col.Insert(bson.M{"uri": uri, "created": int(time.Now().Unix()), "user-agent": useragent, "referer": referrer, "remoteAddress": remoteAddress})
+			c3mcommon.CheckError("checkRequest Insert", err)
+			return true
+		} else {
+			log.Debugf("request ip limited %s", uri)
+		}
 	} else {
-		urlcount, err = col.Find(bson.M{"uri": uri, "created": bson.M{"$gt": int(time.Now().Unix()) - 1}}).Count()
-		if urlcount < 50 {
-			log.Debugf("same url count %d", urlcount)
-			urlcount = 0
-		} else {
-			log.Debugf("request limited %s", uri)
-		}
-	}
-
-	if c3mcommon.CheckError("checkRequest", err) {
-		if urlcount == 0 {
-			//check ip in 3 sec
-			urlcount, err := col.Find(bson.M{"remoteAddress": remoteAddress, "created": bson.M{"$gt": int(time.Now().Unix()) - 1}}).Count()
-			if urlcount < 500 {
-				err = col.Insert(bson.M{"uri": uri, "created": int(time.Now().Unix()), "user-agent": useragent, "referer": referrer, "remoteAddress": remoteAddress})
-				c3mcommon.CheckError("checkRequest Insert", err)
-				return true
-			} else {
-				log.Debugf("request ip limited %s", uri)
-			}
-
-		} else {
-			log.Debugf("request limited 2 %s", uri)
-		}
+		log.Debugf("request limited %s", uri)
 	}
 
 	return false
