@@ -46,14 +46,15 @@ type OrderItem struct {
 }
 
 type OrderStatus struct {
-	ID            bson.ObjectId       `bson:"_id,omitempty"`
-	Title         string              `bson:"title"`
-	Default       bool                `bson:"default"`
-	Finish        bool                `bson:"finish"`
-	UserId        string              `bson:"userid"`
-	ShopId        string              `bson:"shopid"`
-	Created       time.Time           `bson:"created"`
-	Modified      time.Time           `bson:"modified"`
-	Color         string              `bson:"color"`
+	ID            bson.ObjectId `bson:"_id,omitempty"`
+	Title         string        `bson:"title"`
+	Default       bool          `bson:"default"`
+	Finish        bool          `bson:"finish"`
+	UserId        string        `bson:"userid"`
+	ShopId        string        `bson:"shopid"`
+	Created       time.Time     `bson:"created"`
+	Modified      time.Time     `bson:"modified"`
+	Color         string        `bson:"color"`
+	OrderCount    int
 	PartnerStatus map[string][]string `bson:partnerstatus`
 }

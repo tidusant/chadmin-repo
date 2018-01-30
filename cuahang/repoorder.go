@@ -40,7 +40,10 @@ func GetOrdersByStatus(shopid, status string, page int, pagesize int, searchterm
 	// //err := pipe.AllowDiskUse().All(&result) //allow disk use
 	// err := pipe.All(&rs)
 
-	cond := bson.M{"shopid": shopid, "status": status}
+	cond := bson.M{"shopid": shopid}
+	if status != "all" {
+		cond["status"] = status
+	}
 	if searchterm != "" {
 		searchtermslug := strings.Replace(searchterm, " ", "-", -1)
 		searchtermslug = inflect.ParameterizeJoin(searchtermslug, ".")
@@ -71,7 +74,10 @@ func GetOrdersByStatus(shopid, status string, page int, pagesize int, searchterm
 func CountOrdersByStatus(shopid, status, searchterm string) int {
 	col := db.C("addons_orders")
 
-	cond := bson.M{"shopid": shopid, "status": status}
+	cond := bson.M{"shopid": shopid}
+	if status != "all" {
+		cond["status"] = status
+	}
 	if searchterm != "" {
 		searchtermslug := inflect.Parameterize(searchterm)
 		searchtermslug = strings.Replace(searchtermslug, "-", "", -1)
