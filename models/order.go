@@ -31,9 +31,10 @@ type Order struct {
 	PartnerShipFee int    `bson:"partnershipfee"`
 	ShipFee        int    `bson:"shipfee"`
 
-	Items    []OrderItem `bson:"items"`
-	Created  int64       `bson:"created"`
-	Modified int64       `bson:"modified"`
+	Items       []OrderItem `bson:"items"`
+	Created     int64       `bson:"created"`
+	Modified    int64       `bson:"modified"`
+	SearchIndex string      `bson:"searchindex"`
 }
 
 type OrderItem struct {

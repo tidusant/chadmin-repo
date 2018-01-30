@@ -6,7 +6,6 @@ import (
 	"github.com/tidusant/c3m-common/log"
 	"github.com/tidusant/chadmin-repo/models"
 
-	"strings"
 	"time"
 
 	"gopkg.in/mgo.v2/bson"
@@ -45,20 +44,20 @@ func GetOrdersByStatus(shopid, status string, page int, pagesize int, searchterm
 		cond["status"] = status
 	}
 	if searchterm != "" {
-		searchtermslug := strings.Replace(searchterm, " ", "-", -1)
-		searchtermslug = inflect.ParameterizeJoin(searchtermslug, ".")
+		//searchtermslug := strings.Replace(searchterm, " ", "-", -1)
+		searchtermslug := inflect.ParameterizeJoin(searchterm, " ")
 		log.Debugf("searchteram slug: $s", searchtermslug)
 		//searchtermslug = strings.Replace(searchtermslug, "-", " ", -1)
 		//log.Debugf("searchteram slug: $s", searchtermslug)
 		cond["$or"] = []bson.M{
-			bson.M{"phone": bson.M{"$regex": bson.RegEx{searchterm, "si"}}},
-			bson.M{"email": bson.M{"$regex": bson.RegEx{searchterm, "si"}}},
-			bson.M{"name": bson.M{"$regex": bson.RegEx{searchterm, "si"}}},
-			//bson.M{"name": bson.M{"$regex": bson.RegEx{searchtermslug, "si"}}},
-			bson.M{"address": bson.M{"$regex": bson.RegEx{searchterm, "si"}}},
-			//bson.M{"address": bson.M{"$regex": bson.RegEx{searchtermslug, "si"}}},
-			bson.M{"note": bson.M{"$regex": bson.RegEx{searchterm, "si"}}},
-			//bson.M{"note": bson.M{"$regex": bson.RegEx{searchtermslug, "si"}}},
+			bson.M{"searchindex": bson.M{"$regex": bson.RegEx{searchtermslug, "si"}}},
+			// bson.M{"email": bson.M{"$regex": bson.RegEx{searchterm, "si"}}},
+			// bson.M{"name": bson.M{"$regex": bson.RegEx{searchterm, "si"}}},
+			// bson.M{"name": bson.M{"$regex": bson.RegEx{searchtermslug, "si"}}},
+			// bson.M{"address": bson.M{"$regex": bson.RegEx{searchterm, "si"}}},
+			// bson.M{"address": bson.M{"$regex": bson.RegEx{searchtermslug, "si"}}},
+			// bson.M{"note": bson.M{"$regex": bson.RegEx{searchterm, "si"}}},
+			// bson.M{"note": bson.M{"$regex": bson.RegEx{searchtermslug, "si"}}},
 		}
 	}
 
@@ -79,17 +78,12 @@ func CountOrdersByStatus(shopid, status, searchterm string) int {
 		cond["status"] = status
 	}
 	if searchterm != "" {
-		searchtermslug := inflect.Parameterize(searchterm)
-		searchtermslug = strings.Replace(searchtermslug, "-", "", -1)
+		searchtermslug := inflect.ParameterizeJoin(searchterm, " ")
+		log.Debugf("searchteram slug: $s", searchtermslug)
+		//searchtermslug = strings.Replace(searchtermslug, "-", " ", -1)
+		//log.Debugf("searchteram slug: $s", searchtermslug)
 		cond["$or"] = []bson.M{
-			bson.M{"phone": bson.M{"$regex": bson.RegEx{searchterm, "si"}}},
-			bson.M{"email": bson.M{"$regex": bson.RegEx{searchterm, "si"}}},
-			bson.M{"name": bson.M{"$regex": bson.RegEx{searchterm, "si"}}},
-			bson.M{"name": bson.M{"$regex": bson.RegEx{searchtermslug, "si"}}},
-			bson.M{"address": bson.M{"$regex": bson.RegEx{searchterm, "si"}}},
-			bson.M{"address": bson.M{"$regex": bson.RegEx{searchtermslug, "si"}}},
-			bson.M{"note": bson.M{"$regex": bson.RegEx{searchterm, "si"}}},
-			bson.M{"note": bson.M{"$regex": bson.RegEx{searchtermslug, "si"}}},
+			bson.M{"searchindex": bson.M{"$regex": bson.RegEx{searchtermslug, "si"}}},
 		}
 	}
 
