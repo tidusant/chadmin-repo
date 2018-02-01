@@ -34,6 +34,7 @@ type Order struct {
 	Items       []OrderItem `bson:"items"`
 	Created     int64       `bson:"created"`
 	Modified    int64       `bson:"modified"`
+	Whookupdate int64       `bson:"whookupdate"`
 	SearchIndex string      `bson:"searchindex"`
 }
 
