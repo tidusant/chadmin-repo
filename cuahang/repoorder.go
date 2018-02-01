@@ -151,11 +151,8 @@ func GetCountOrderByStatus(stat models.OrderStatus) int {
 func UpdateOrderStatusByShipmentCode(shipmentCode, statusid, shopid string) {
 	col := db.C("addons_orders")
 	cond := bson.M{"shopid": shopid, "shipmentcode": shipmentCode}
-	//log.Debugf("shipmentcode %s, shopid %s, status %s", shipmentCode, shopid, statusid)
 	change := bson.M{"$set": bson.M{"status": statusid, "whookupdate": time.Now().Unix()}}
-	// n, err := col.Find(cond).Count()
-	// log.Debugf("count: %d", n)
-	// c3mcommon.CheckError("UpdateOrderStatusByShipmentCode count", err)
+
 	err := col.Update(cond, change)
 	c3mcommon.CheckError("UpdateOrderStatusByShipmentCode", err)
 }
