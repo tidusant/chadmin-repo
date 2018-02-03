@@ -118,8 +118,17 @@ func UpdateOrderStatus(shopid, status string, orderid []string) {
 		arrIdObj = append(arrIdObj, bson.ObjectIdHex(v))
 	}
 	cond := bson.M{"_id": bson.M{"$in": arrIdObj}, "shopid": shopid}
-	change := bson.M{"$set": bson.M{"status": status}}
-	err := col.Update(cond, change)
+	change := bson.M{"status": status}
+	stats := GetAllOrderStatus(shopid)
+	mapstat := make(map[string]models.OrderStatus)
+	for _, v := range stats {
+		mapstat[v.ID.Hex()] = v
+	}
+
+	if mapstat[status].Finish {
+		change["whookupdate"] = time.Now().Unix()
+	}
+	err := col.Update(cond, bson.M{"$set": change})
 	c3mcommon.CheckError("Update order status", err)
 	return
 }
