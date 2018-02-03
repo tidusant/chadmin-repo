@@ -129,9 +129,10 @@ func SaveOrder(order models.Order) models.Order {
 	if order.ID == "" {
 		order.ID = bson.NewObjectId()
 		order.Created = time.Now().Unix()
+
 	}
 
-	order.Modified = order.Created
+	order.Modified = time.Now().Unix()
 	col.UpsertId(order.ID, order)
 	return order
 }
