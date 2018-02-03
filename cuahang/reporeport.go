@@ -19,7 +19,7 @@ func GetOrdersReportByRange(shopid string, start, end time.Time, byship bool) mo
 	andcond := []bson.M{}
 	if start.Year() > 1970 {
 		if byship {
-			andcond = append(andcond, bson.M{"whookupdate": bson.M{"$gt": start.Unix()}})
+			andcond = append(andcond, bson.M{"modified": bson.M{"$gt": start.Unix()}})
 		} else {
 			andcond = append(andcond, bson.M{"created": bson.M{"$gt": start.Unix()}})
 		}
@@ -29,7 +29,7 @@ func GetOrdersReportByRange(shopid string, start, end time.Time, byship bool) mo
 	}
 	if end.Year() > 1970 {
 		if byship {
-			andcond = append(andcond, bson.M{"whookupdate": bson.M{"$lt": end.Unix()}})
+			andcond = append(andcond, bson.M{"modified": bson.M{"$lt": end.Unix()}})
 		} else {
 			andcond = append(andcond, bson.M{"created": bson.M{"$lt": end.Unix()}})
 		}
