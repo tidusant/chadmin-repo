@@ -17,7 +17,14 @@ func SaveWhook(whook models.Whook) string {
 	c3mcommon.CheckError("whook insert", err)
 	return "1"
 }
+func GetWhookByLabel(label string) []models.Whook {
+	var rs []models.Whook
+	col := db.C("addons_whook")
 
+	err := col.Find(bson.M{"data": bson.M{"$regex": bson.RegEx{label, "si"}}}).All(&rs)
+	c3mcommon.CheckError("GetWhook by label", err)
+	return rs
+}
 func GetWhook() models.Whook {
 
 	col := db.C("addons_whook")
