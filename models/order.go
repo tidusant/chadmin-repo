@@ -30,6 +30,7 @@ type Order struct {
 	BaseTotal      int    `bson:"basetotal"`
 	PartnerShipFee int    `bson:"partnershipfee"`
 	ShipFee        int    `bson:"shipfee"`
+	IsPaid         bool   `json:"ispaid"`
 
 	Items       []OrderItem `bson:"items"`
 	Created     int64       `bson:"created"`
