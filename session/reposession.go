@@ -67,7 +67,6 @@ func CheckSession(s string) bool {
 func CheckRequest(uri, useragent, referrer, remoteAddress, requestType string) bool {
 
 	col := db.C("requestUrls")
-	log.Printf("now: %d , check: %d", int(time.Now().Unix()), int(time.Now().Unix())-10)
 
 	urlcount, _ := col.Find(bson.M{"uri": uri, "created": bson.M{"$gt": int(time.Now().Unix()) - 1}}).Count()
 	if urlcount < 50 {

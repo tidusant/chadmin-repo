@@ -17,6 +17,14 @@ func CountOrderByCus(phone, shopid string) int {
 	c3mcommon.CheckError("count order cus by phone", err)
 	return rs
 }
+func GetAllCustomers(shopid string) []models.Customer {
+	col := db.C("addons_customers")
+	var rs []models.Customer
+	cond := bson.M{"shopid": shopid}
+	err := col.Find(cond).All(&rs)
+	c3mcommon.CheckError("GetAllCustomers", err)
+	return rs
+}
 func GetCusByPhone(phone, shopid string) models.Customer {
 	col := db.C("addons_customers")
 	var rs models.Customer
