@@ -2,6 +2,7 @@ package cuahang
 
 import (
 	"github.com/tidusant/c3m-common/c3mcommon"
+	"github.com/tidusant/c3m-common/log"
 	"github.com/tidusant/chadmin-repo/models"
 	//	"c3m/log"
 
@@ -33,11 +34,21 @@ func SaveProd(prod models.Product) string {
 	langinfo, _ := json.Marshal(prod.Langs)
 	return "{\"Code\":\"" + prod.Code + "\",\"Langs\":" + string(langinfo) + "}"
 }
-func GetAllProds(userid, shopid string) []models.Product {
+func SaveProperties(shopid, code string, props []models.ProductProperty) bool {
+	col := db.C("addons_products")
+
+	cond := bson.M{"shopid": shopid, "code": code}
+	change := bson.M{"properties": props}
+	err := col.Update(cond, bson.M{"$set": change})
+
+	return c3mcommon.CheckError("SaveProperties", err)
+
+}
+func GetAllProds(userid, shopid string, isMain bool) []models.Product {
 	col := db.C("addons_products")
 	var rs []models.Product
 	shop := GetShopById(userid, shopid)
-	err := col.Find(bson.M{"shopid": shop.ID.Hex()}).All(&rs)
+	err := col.Find(bson.M{"shopid": shop.ID.Hex(), "main": isMain}).All(&rs)
 	c3mcommon.CheckError("getprod", err)
 	return rs
 }
@@ -77,6 +88,29 @@ func GetProdsByCatId(shopid, catcode string) []models.Product {
 	c3mcommon.CheckError("getprod", err)
 
 	return rs
+
+}
+
+func ExportItem(shopid, code, itemcode string, num int) bool {
+	col := db.C("addons_products")
+	var rs models.Product
+
+	//subcond := bson.M{"$elemMatch": bson.M{"code": itemcode}}
+	cond := bson.M{"shopid": shopid, "code": code}
+	err := col.Find(cond).One(&rs)
+	for k, v := range rs.Properties {
+		if v.Code == itemcode {
+			rs.Properties[k].Stock -= num
+			if rs.Properties[k].Stock >= 0 {
+				SaveProd(rs)
+				return true
+			}
+			break
+		}
+	}
+	c3mcommon.CheckError("ExportItem", err)
+	log.Debugf("find exportitem code %s prodcode %s num %d  %v", itemcode, code, num, rs)
+	return false
 
 }
 

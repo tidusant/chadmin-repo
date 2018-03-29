@@ -111,13 +111,14 @@ func GetDefaultOrderStatus(shopid string) models.OrderStatus {
 	return rs
 }
 
-func UpdateOrderStatus(shopid, status string, orderid []string) {
+func UpdateOrderStatus(shopid, status string, orderid string) {
 	col := db.C("addons_orders")
-	var arrIdObj []bson.ObjectId
-	for _, v := range orderid {
-		arrIdObj = append(arrIdObj, bson.ObjectIdHex(v))
-	}
-	cond := bson.M{"_id": bson.M{"$in": arrIdObj}, "shopid": shopid}
+	//var arrIdObj []bson.ObjectId
+	// for _, v := range orderid {
+	// 	arrIdObj = append(arrIdObj, bson.ObjectIdHex(v))
+	// }
+	// cond := bson.M{"_id": bson.M{"$in": arrIdObj}, "shopid": shopid}
+	cond := bson.M{"_id": bson.ObjectIdHex(orderid), "shopid": shopid}
 	change := bson.M{"status": status}
 	stats := GetAllOrderStatus(shopid)
 	mapstat := make(map[string]models.OrderStatus)
@@ -128,6 +129,7 @@ func UpdateOrderStatus(shopid, status string, orderid []string) {
 	if mapstat[status].Finish {
 		change["whookupdate"] = time.Now().Unix()
 	}
+	log.Debugf("udpate order cond:%v", cond)
 	err := col.Update(cond, bson.M{"$set": change})
 	c3mcommon.CheckError("Update order status", err)
 	return

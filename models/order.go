@@ -40,6 +40,7 @@ type Order struct {
 }
 
 type OrderItem struct {
+	ProdCode  string `bson:"prodcode"`
 	Code      string `bson:"code"`
 	Title     string `bson:"title"`
 	Avatar    string `bson:"avatar"`
@@ -53,6 +54,7 @@ type OrderStatus struct {
 	Title         string        `bson:"title"`
 	Default       bool          `bson:"default"`
 	Finish        bool          `bson:"finish"`
+	Export        bool          `bson:"export"`
 	UserId        string        `bson:"userid"`
 	ShopId        string        `bson:"shopid"`
 	Created       time.Time     `bson:"created"`
