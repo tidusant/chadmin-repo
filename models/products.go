@@ -34,12 +34,13 @@ type ProductLang struct {
 	BasePrice       int    `bson:"baseprice"`
 	DiscountPrice   int    `bson:"discountprice"`
 	PercentDiscount int    `bson:"percentdiscount"`
-	Currency        string
-	Description     string   `bson:"description"`
-	Content         string   `bson:"content"`
-	Avatar          string   `bson:"avatar"`
-	Images          []string `bson:"images"`
-	Viewed          int      `bson:"viewed"`
+	Unit            string `bson:"unit"`
+
+	Description string   `bson:"description"`
+	Content     string   `bson:"content"`
+	Avatar      string   `bson:"avatar"`
+	Images      []string `bson:"images"`
+	Viewed      int      `bson:"viewed"`
 }
 
 type ProdCatInfo struct {
