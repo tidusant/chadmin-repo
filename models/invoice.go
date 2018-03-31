@@ -25,7 +25,7 @@ type InvoiceItem struct {
 	PropertyName string `json:"propname"`
 	PropertyCode string `json:"propcode"`
 	Unit         string `json:"unit"`
-	Import       bool   `json:"import"`
-	Stock        int    `json:"propstock"`
-	BasePrice    int    `json:"propbaseprice"`
+
+	Stock     int `json:"propstock"`
+	BasePrice int `json:"propbaseprice"`
 }
