@@ -58,4 +58,5 @@ type ProdCat struct {
 	ShopId  string                  `bson:"shopid"`
 	Created time.Time               `bson:"created"`
 	Langs   map[string]*ProdCatInfo `bson:"langs"`
+	Main       bool                    `bson:"main"`
 }

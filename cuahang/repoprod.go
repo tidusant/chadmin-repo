@@ -142,6 +142,16 @@ func GetAllCats(userid, shopid string) []models.ProdCat {
 	return rs
 }
 
+func GetCats(userid, shopid string, ismain bool) []models.ProdCat {
+	col := db.C("addons_prodcats")
+	var rs []models.ProdCat
+	cond := bson.M{"shopid": shopid, "main": ismain}
+
+	err := col.Find(cond).All(&rs)
+	c3mcommon.CheckError("getcatprod", err)
+	return rs
+}
+
 func GetDemoProdCats() []models.ProdCat {
 	col := db.C("addons_prodcats")
 	shop := GetDemoShop()
