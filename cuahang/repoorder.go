@@ -168,6 +168,15 @@ func UpdateOrderStatusByShipmentCode(shipmentCode, statusid, shopid string) {
 	err := col.Update(cond, change)
 	c3mcommon.CheckError("UpdateOrderStatusByShipmentCode", err)
 }
+func GetOrderByShipmentCode(shipmentCode, shopid string) models.Order {
+	col := db.C("addons_orders")
+	var rs models.Order
+	cond := bson.M{"shopid": shopid, "shipmentcode": shipmentCode}
+	err := col.Find(cond).One(&rs)
+
+	c3mcommon.CheckError("GetOrderByShipmentCode", err)
+	return rs
+}
 func GetStatusByPartnerStatus(partnercode, shopid, partnerstatus string) models.OrderStatus {
 	col := db.C("addons_order_status")
 	var rs models.OrderStatus
