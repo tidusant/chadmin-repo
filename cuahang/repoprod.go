@@ -32,7 +32,8 @@ func SaveProd(prod models.Product) string {
 	}
 	//}
 	langinfo, _ := json.Marshal(prod.Langs)
-	return "{\"Code\":\"" + prod.Code + "\",\"Langs\":" + string(langinfo) + "}"
+	propinfo, _ := json.Marshal(prod.Properties)
+	return "{\"Code\":\"" + prod.Code + "\",\"Langs\":" + string(langinfo) + ",\"Properties\":" + string(propinfo) + "}"
 }
 func SaveProperties(shopid, code string, props []models.ProductProperty) bool {
 	col := db.C("addons_products")
@@ -44,11 +45,19 @@ func SaveProperties(shopid, code string, props []models.ProductProperty) bool {
 	return c3mcommon.CheckError("SaveProperties", err)
 
 }
-func GetAllProds(userid, shopid string, isMain bool) []models.Product {
+func GetProds(userid, shopid string, isMain bool) []models.Product {
 	col := db.C("addons_products")
 	var rs []models.Product
 	shop := GetShopById(userid, shopid)
 	err := col.Find(bson.M{"shopid": shop.ID.Hex(), "main": isMain}).All(&rs)
+	c3mcommon.CheckError("getprod", err)
+	return rs
+}
+func GetAllProds(userid, shopid string) []models.Product {
+	col := db.C("addons_products")
+	var rs []models.Product
+	shop := GetShopById(userid, shopid)
+	err := col.Find(bson.M{"shopid": shop.ID.Hex()}).All(&rs)
 	c3mcommon.CheckError("getprod", err)
 	return rs
 }
