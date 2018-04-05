@@ -30,6 +30,15 @@ func GetInvoices(shopid string, imp bool) []models.Invoice {
 	c3mcommon.CheckError("GetInvoices", err)
 	return rs
 }
+func GetInvcById(shopid, invcid string) models.Invoice {
+
+	col := db.C("addons_invoice")
+	var rs models.Invoice
+	err := col.Find(bson.M{"shopid": shopid, "_id": bson.ObjectIdHex(invcid)}).One(&rs)
+	c3mcommon.CheckError("GetInvcById", err)
+
+	return rs
+}
 func RemoveInvcById(shopid, invcid string) bool {
 
 	col := db.C("addons_invoice")

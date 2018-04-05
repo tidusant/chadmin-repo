@@ -48,17 +48,17 @@ func SaveProperties(shopid, code string, props []models.ProductProperty) bool {
 func GetProds(userid, shopid string, isMain bool) []models.Product {
 	col := db.C("addons_products")
 	var rs []models.Product
-	shop := GetShopById(userid, shopid)
-	err := col.Find(bson.M{"shopid": shop.ID.Hex(), "main": isMain}).All(&rs)
+
+	err := col.Find(bson.M{"shopid": shopid, "main": isMain}).All(&rs)
 	c3mcommon.CheckError("getprod", err)
 	return rs
 }
 func GetAllProds(userid, shopid string) []models.Product {
 	col := db.C("addons_products")
 	var rs []models.Product
-	shop := GetShopById(userid, shopid)
-	err := col.Find(bson.M{"shopid": shop.ID.Hex()}).All(&rs)
-	c3mcommon.CheckError("getprod", err)
+
+	err := col.Find(bson.M{"shopid": shopid}).All(&rs)
+	c3mcommon.CheckError("GetAllProds", err)
 	return rs
 }
 func GetDemoProds() []models.Product {
