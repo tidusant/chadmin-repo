@@ -63,3 +63,10 @@ type OrderStatus struct {
 	OrderCount    int
 	PartnerStatus map[string][]string `bson:partnerstatus`
 }
+
+type ExportItem struct {
+	ShopId   string `json:"prodcode"`
+	Code     string `json:"code"`
+	ItemCode string `json:"title"`
+	Num      int    `json:"num"`
+}

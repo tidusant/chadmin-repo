@@ -2,7 +2,6 @@ package cuahang
 
 import (
 	"github.com/tidusant/c3m-common/c3mcommon"
-	"github.com/tidusant/c3m-common/log"
 	"github.com/tidusant/chadmin-repo/models"
 	//	"c3m/log"
 
@@ -100,26 +99,26 @@ func GetProdsByCatId(shopid, catcode string) []models.Product {
 
 }
 
-func ExportItem(shopid, code, itemcode string, num int) bool {
+func ExportItem(exportitems []models.ExportItem) bool {
 	col := db.C("addons_products")
 	var rs models.Product
 
 	//subcond := bson.M{"$elemMatch": bson.M{"code": itemcode}}
-	cond := bson.M{"shopid": shopid, "code": code}
-	err := col.Find(cond).One(&rs)
-	for k, v := range rs.Properties {
-		if v.Code == itemcode {
-			rs.Properties[k].Stock -= num
-			if rs.Properties[k].Stock >= 0 {
+	for _, item := range exportitems {
+		cond := bson.M{"shopid": item.ShopId, "code": item.Code}
+		err := col.Find(cond).One(&rs)
+		for k, v := range rs.Properties {
+			if v.Code == item.ItemCode {
+				rs.Properties[k].Stock -= item.Num
 				SaveProd(rs)
-				return true
+				break
 			}
-			break
 		}
+		c3mcommon.CheckError("ExportItem", err)
+
 	}
-	c3mcommon.CheckError("ExportItem", err)
-	log.Debugf("find exportitem code %s prodcode %s num %d  %v", itemcode, code, num, rs)
-	return false
+
+	return true
 
 }
 
