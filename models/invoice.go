@@ -28,4 +28,5 @@ type InvoiceItem struct {
 
 	Stock     int `json:"propstock"`
 	BasePrice int `json:"propbaseprice"`
+	Price     int `json:"propprice"`
 }
