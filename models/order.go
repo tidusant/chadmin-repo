@@ -42,6 +42,7 @@ type Order struct {
 type OrderItem struct {
 	ProdCode  string `bson:"prodcode"`
 	Code      string `bson:"code"`
+	CatName   string `bson:"catname"`
 	Title     string `bson:"title"`
 	Avatar    string `bson:"avatar"`
 	BasePrice int    `bson:"baseprice"`
