@@ -9,6 +9,14 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+func SaveFBWhook(whook models.FBWhook) string {
+
+	col := db.C("addons_fbwhook")
+
+	err := col.Insert(whook)
+	c3mcommon.CheckError("SaveFBWhook", err)
+	return "1"
+}
 func SaveWhook(whook models.Whook) string {
 
 	col := db.C("addons_whook")
