@@ -8,14 +8,15 @@ import (
 
 //Page ...
 type Page struct {
-	ID       bson.ObjectId        `bson:"_id,omitempty"`
-	Code     string               `bson:"code"`
-	UserID   string               `bson:"userid"`
-	ShopID   string               `bson:"shopid"`
-	Langs    map[string]*PageLang `bson:"langs"`
-	Created  time.Time            `bson:"created"`
-	Modified time.Time            `bson:"modified"`
-	Publish  bool                 `bson:"publish"`
+	ID          bson.ObjectId        `bson:"_id,omitempty"`
+	Code        string               `bson:"code"`
+	UserID      string               `bson:"userid"`
+	ShopID      string               `bson:"shopid"`
+	Langs       map[string]*PageLang `bson:"langs"`
+	Created     time.Time            `bson:"created"`
+	Modified    time.Time            `bson:"modified"`
+	Publish     bool                 `bson:"publish"`
+	AltPagename string
 }
 
 //NewsLang ...

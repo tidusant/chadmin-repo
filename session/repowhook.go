@@ -47,3 +47,31 @@ func GetWhook() models.Whook {
 	c3mcommon.CheckError("GetWhook script", err)
 	return bs
 }
+
+func GetFBWhook() models.FBWhook {
+
+	col := db.C("addons_fbwhook")
+	var bs models.FBWhook
+	change := mgo.Change{
+		Update:    bson.M{"$set": bson.M{"status": 1, "modified": time.Now().Unix()}},
+		ReturnNew: true,
+	}
+	_, err := col.Find(bson.M{"status": bson.M{"$ne": 1}}).Apply(change, &bs)
+	c3mcommon.CheckError("GetFBWhook script", err)
+	return bs
+}
+
+func SaveFBComment(fbcomment models.FBComment) string {
+
+	col := db.C("addons_fbcomment")
+	err := col.Insert(fbcomment)
+	c3mcommon.CheckError("SaveFBComment insert", err)
+	return "1"
+}
+func SaveFBConversation(fbcon models.FBConversation) string {
+
+	col := db.C("addons_fbconversation")
+	err := col.Insert(fbcon)
+	c3mcommon.CheckError("SaveFBConversation insert", err)
+	return "1"
+}

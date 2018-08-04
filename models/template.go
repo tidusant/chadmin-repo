@@ -1,6 +1,7 @@
 package models
 
 import (
+	"encoding/json"
 	"time"
 
 	"gopkg.in/mgo.v2/bson"
@@ -47,4 +48,16 @@ type TemplateLang struct {
 	ShopID       string        `bson:"shopid"`
 	Key          string        `bson:"key"`
 	Value        string        `bson:"value"`
+}
+
+type TemplateViewData struct {
+	PageName     string
+	Siteurl      string
+	Data         map[string]json.RawMessage
+	TemplatePath string
+	Templateurl  string
+	Imageurl     string
+	Pages        map[string]string
+	Resources    map[string]string
+	Configs      map[string]string
 }
