@@ -223,6 +223,15 @@ func GetDemoShop() models.Shop {
 //	return rt
 
 //}
+func SaveConfig(shop models.Shop) models.Shop {
+	coluser := db.C("addons_shops")
+
+	cond := bson.M{"_id": shop.ID}
+	change := bson.M{"$set": bson.M{"config": shop.Config}}
+
+	coluser.Update(cond, change)
+	return shop
+}
 func UpdateAlbum(shop models.Shop) models.Shop {
 	coluser := db.C("addons_shops")
 

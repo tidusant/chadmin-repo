@@ -11,21 +11,6 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func GetTemplateConfigs(shopid, templatecode string) []models.TemplateConfig {
-	col := db.C("addons_configs")
-	var rs []models.TemplateConfig
-	err := col.Find(bson.M{"shopid": shopid, "templatecode": templatecode}).All(&rs)
-	c3mcommon.CheckError("get template configs", err)
-	return rs
-}
-func GetTemplateConfigByKey(shopid, templatecode, key string) models.TemplateConfig {
-	col := db.C("addons_configs")
-	var rs models.TemplateConfig
-	err := col.Find(bson.M{"shopid": shopid, "templatecode": templatecode, "key": key}).One(&rs)
-	c3mcommon.CheckError("get template configs", err)
-	return rs
-}
-
 func GetTemplateLang(shopid, templatecode, lang string) []models.TemplateLang {
 	col := db.C("addons_langs")
 	var rs []models.TemplateLang

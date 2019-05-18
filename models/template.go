@@ -17,18 +17,28 @@ type Template struct {
 	Viewed       int           `bson:"viewed"`
 	InstalledIDs []string      `bson:"installedid"`
 	ActiveIDs    []string      `bson:"activedid"`
+	Configs      string        `bson:"configs"`
+	Resources    string        `bson:"resources"`
+	Pages        string        `bson:"pages"`
 	Avatar       string        `bson:"avatar"`
 	Created      time.Time     `bson:"created"`
 	Modified     time.Time     `bson:"modified"`
-	Content      string        `bson:"content"`
-	Pages        string        `bson:"pages"`
-	CSS          string        `bson:"css"`
-	Script       string        `bson:"script"`
-	Images       string        `bson:"images"`
-	Fonts        string        `bson:"fonts"`
-	Screenshot   string        `bson:"screenshot"`
-	Configs      string        `bson:"configs"`
-	Langs        string        `bson:"langs"`
+}
+
+type TemplateSubmit struct {
+	Code       string `bson:"code"`
+	Title      string `bson:"title"`
+	Content    string `bson:"content"`
+	Layout     string `bson:"layout"`
+	Models     string `bson:"models"`
+	Pages      string `bson:"pages"`
+	CSS        string `bson:"css"`
+	Script     string `bson:"script"`
+	Images     string `bson:"images"`
+	Fonts      string `bson:"fonts"`
+	Screenshot string `bson:"screenshot"`
+	Configs    string `bson:"configs"`
+	Resources  string `bson:"resources"`
 }
 
 //News ...

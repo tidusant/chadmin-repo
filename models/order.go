@@ -9,6 +9,7 @@ import (
 type Order struct {
 	ID             bson.ObjectId `bson:"_id,omitempty"`
 	ShopId         string        `bson:"shopid"`
+	EmployeeId     string        `bson:"employeeid"`
 	CampaignId     string        `bson:"campaignid"`
 	CampaignName   string
 	ShipperId      string `bson:"shipperid"`

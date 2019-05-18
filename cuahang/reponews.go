@@ -3,6 +3,7 @@ package cuahang
 import (
 	"github.com/tidusant/c3m-common/c3mcommon"
 	"github.com/tidusant/chadmin-repo/models"
+
 	//	"c3m/log"
 
 	//"strings"
@@ -11,7 +12,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func SaveNews(newitem models.News) string {
+func SaveNews(newitem *models.News) string {
 
 	col := db.C("addons_news")
 
@@ -30,8 +31,11 @@ func SaveNews(newitem models.News) string {
 		col.RemoveId(newitem.ID)
 	}
 	//}
+
+	//remove content in response
 	for lang, _ := range newitem.Langs {
 		newitem.Langs[lang].Content = ""
+
 	}
 	langinfo, _ := json.Marshal(newitem.Langs)
 	return "{\"Code\":\"" + newitem.Code + "\",\"Langs\":" + string(langinfo) + "}"
@@ -78,13 +82,13 @@ func GetNewsByCatId(userid, shopid, catcode string) []models.Product {
 }
 
 //=========================cat function==================
-func SaveNewsCat(cat models.NewsCat) string {
+func SaveNewsCat(cat *models.NewsCat) string {
 	col := db.C("addons_newscats")
 	if len(cat.Langs) > 0 {
 		if cat.ID == "" {
 			cat.ID = bson.NewObjectId()
 		}
-		col.UpsertId(cat.ID, cat)
+		col.UpsertId(cat.ID, &cat)
 	} else {
 		col.RemoveId(cat.ID)
 	}
@@ -115,6 +119,6 @@ func GetNewsCatByCode(userid, shopid, code string) models.NewsCat {
 	col := db.C("addons_newscats")
 	var rs models.NewsCat
 	err := col.Find(bson.M{"shopid": shopid, "code": code}).One(&rs)
-	c3mcommon.CheckError("getcatbycode", err)
+	c3mcommon.CheckError("GetNewsCatByCode", err)
 	return rs
 }

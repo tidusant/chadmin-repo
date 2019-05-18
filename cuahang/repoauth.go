@@ -68,7 +68,7 @@ func Login(user, pass, session, userIP string) string {
 
 		_, err := coluserlogin.UpsertId(userlogin.UserId, &userlogin)
 		c3mcommon.CheckError("Upsert login", err)
-		return result.Name
+		return result.User
 	}
 	return ""
 

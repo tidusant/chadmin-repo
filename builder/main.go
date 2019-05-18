@@ -32,12 +32,9 @@ func init() {
 func CreateBuild(bs models.BuildScript) string {
 	col := db.C("builds")
 	//remove old build
-	cond := bson.M{"status": 0, "shopid": bs.ShopID, "objectid": bs.ObjectID}
+	cond := bson.M{"object": bs.Object, "shopid": bs.ShopId, "objectid": bs.ObjectId}
 	//"objectid": buildscript.ObjectID, "collection": buildscript.Collection}
-	if bs.ObjectID != "home" && bs.ObjectID != "script" {
-		cond["collection"] = bs.Collection
-	}
-	//change := bson.M{"$set": bson.M{"status": -1}}
+
 	_, err := col.RemoveAll(cond)
 
 	bs.Status = 0
@@ -45,10 +42,6 @@ func CreateBuild(bs models.BuildScript) string {
 	bs.Modified = time.Now().Unix()
 	err = col.Insert(bs)
 	c3mcommon.CheckError("insert build script", err)
-	if bs.ObjectID != "home" {
-		bs.ObjectID = "home"
-		CreateBuild(bs)
-	}
 
 	return ""
 }
@@ -60,17 +53,29 @@ func GetBuild() models.BuildScript {
 		Update:    bson.M{"$set": bson.M{"status": 1, "modified": time.Now().Unix()}},
 		ReturnNew: true,
 	}
-	_, err := col.Find(bson.M{"status": 0}).Apply(change, &bs)
-	c3mcommon.CheckError("GetBuild script", err)
+	col.Find(bson.M{"status": 0}).Apply(change, &bs)
+
 	return bs
 
 }
+func SaveConfig(config models.BuildConfig) {
+	col := db.C("configs")
+	//check  exist:
 
-func RemoveBuild(shopID string) string {
+	var oldcf models.BuildConfig
+	err := col.Find(bson.M{"shopid": config.ShopId}).One(&oldcf)
+	if oldcf.ID.Hex() == "" {
+		return
+	}
+	config.ID = oldcf.ID
+	_, err = col.UpsertId(config.ID, config)
+	c3mcommon.CheckError("UpsertId SaveConfig", err)
+}
+func RemoveAllBuild(shopID string) string {
 	col := db.C("builds")
-	cond := bson.M{"status": 0, "shopid": shopID}
+	cond := bson.M{"shopid": shopID}
 
 	_, err := col.RemoveAll(cond)
-	c3mcommon.CheckError("insert build script", err)
+	c3mcommon.CheckError("RemoveAllBuild script", err)
 	return ""
 }

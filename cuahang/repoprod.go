@@ -3,6 +3,7 @@ package cuahang
 import (
 	"github.com/tidusant/c3m-common/c3mcommon"
 	"github.com/tidusant/chadmin-repo/models"
+
 	//	"c3m/log"
 
 	//"strings"
@@ -11,7 +12,7 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-func SaveProd(prod models.Product) string {
+func SaveProd(prod *models.Product) string {
 
 	col := db.C("addons_products")
 
@@ -60,6 +61,7 @@ func GetAllProds(userid, shopid string) []models.Product {
 	c3mcommon.CheckError("GetAllProds", err)
 	return rs
 }
+
 func GetDemoProds() []models.Product {
 	col := db.C("addons_products")
 	var rs []models.Product
@@ -93,7 +95,7 @@ func GetProdsByCatId(shopid, catcode string) []models.Product {
 	cond := bson.M{"shopid": shopid, "catid": catcode}
 
 	err := col.Find(cond).All(&rs)
-	c3mcommon.CheckError("getprod", err)
+	c3mcommon.CheckError("GetProdsByCatId", err)
 
 	return rs
 
@@ -110,7 +112,7 @@ func ExportItem(exportitems []models.ExportItem) bool {
 		for k, v := range rs.Properties {
 			if v.Code == item.ItemCode {
 				rs.Properties[k].Stock -= item.Num
-				SaveProd(rs)
+				SaveProd(&rs)
 				break
 			}
 		}
@@ -123,7 +125,7 @@ func ExportItem(exportitems []models.ExportItem) bool {
 }
 
 //=========================cat function==================
-func SaveCat(cat models.ProdCat) string {
+func SaveCat(cat *models.ProdCat) string {
 	col := db.C("addons_prodcats")
 	if len(cat.Langs) > 0 {
 		if cat.ID == "" {
@@ -132,8 +134,7 @@ func SaveCat(cat models.ProdCat) string {
 		} else {
 			//update slug
 		}
-
-		col.UpsertId(cat.ID, cat)
+		col.UpsertId(cat.ID, &cat)
 	} else {
 		col.RemoveId(cat.ID)
 	}
@@ -174,6 +175,6 @@ func GetCatByCode(shopid, code string) models.ProdCat {
 	cond := bson.M{"shopid": shopid, "code": code}
 
 	err := col.Find(cond).One(&rs)
-	c3mcommon.CheckError("getcatbycode", err)
+	c3mcommon.CheckError("GetCatByCode "+code, err)
 	return rs
 }

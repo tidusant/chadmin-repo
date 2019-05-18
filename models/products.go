@@ -14,11 +14,18 @@ type Product struct {
 	CatId      string                  `bson:"catid"`
 	Langs      map[string]*ProductLang `bson:"langs"`
 	Properties []ProductProperty       `bson:"properties"`
+	Options    []ProductOption         `bson:"options"`
 	Status     string                  `bson:"status"`
 	Publish    bool                    `bson:"publish"`
 	Main       bool                    `bson:"main"`
+	IsSync     bool                    `bson:"issync"`
 	Created    time.Time               `bson:"created"`
 	Modified   time.Time               `bson:"modified"`
+	LangLinks  map[string]string       `bson:"langlinks"`
+}
+type ProductOption struct {
+	Name  string   `bson:"name"`
+	Items []string `bson:"items"`
 }
 type ProductProperty struct {
 	Name      string `bson:"name"`
@@ -28,35 +35,28 @@ type ProductProperty struct {
 	Stock     int    `bson:"stock"`
 }
 type ProductLang struct {
-	Name            string `bson:"name"`
-	Slug            string `bson:"slug"`
-	Price           int    `bson:"price"`
-	BasePrice       int    `bson:"baseprice"`
-	DiscountPrice   int    `bson:"discountprice"`
-	PercentDiscount int    `bson:"percentdiscount"`
-	Unit            string `bson:"unit"`
-
-	Description string   `bson:"description"`
-	Content     string   `bson:"content"`
-	Avatar      string   `bson:"avatar"`
-	Images      []string `bson:"images"`
-	Viewed      int      `bson:"viewed"`
-}
-
-type ProdCatInfo struct {
-	Slug        string `bson:"slug"`
-	Name        string `bson:"name"`
-	Description string `bson:"description"`
-	Content     string `bson:"content"`
-	Avatar      string `bson:"avatar"`
+	Avatar          string   `bson:"avatar"`
+	Title           string   `bson:"title"`
+	Name            string   `bson:"name"`
+	Content         string   `bson:"content"`
+	Description     string   `bson:"description"`
+	Slug            string   `bson:"slug"`
+	Price           int      `bson:"price"`
+	BasePrice       int      `bson:"baseprice"`
+	DiscountPrice   int      `bson:"discountprice"`
+	PercentDiscount int      `bson:"percentdiscount"`
+	Unit            string   `bson:"unit"`
+	Images          []string `bson:"images"`
 }
 
 type ProdCat struct {
-	ID      bson.ObjectId           `bson:"_id,omitempty"`
-	Code    string                  `bson:"code"`
-	UserId  string                  `bson:"userid"`
-	ShopId  string                  `bson:"shopid"`
-	Created time.Time               `bson:"created"`
-	Langs   map[string]*ProdCatInfo `bson:"langs"`
-	Main    bool                    `bson:"main"`
+	ID        bson.ObjectId        `bson:"_id,omitempty"`
+	Code      string               `bson:"code"`
+	UserId    string               `bson:"userid"`
+	ShopId    string               `bson:"shopid"`
+	Created   time.Time            `bson:"created"`
+	Langs     map[string]*PageLang `bson:"langs"`
+	IsSync    bool                 `bson:"issync"`
+	Main      bool                 `bson:"main"`
+	LangLinks map[string]string    `bson:"langlinks"`
 }
