@@ -40,16 +40,13 @@ func AuthByKey(key string) models.User {
 	return rs
 }
 
-func GetTemplateConfigs(shopid, templatecode string) map[string]models.TemplateConfig {
+func GetTemplateConfigs(shopid, templatecode string) []models.TemplateConfig {
 	col := db.C("configs")
 	var rs []models.TemplateConfig
 	err := col.Find(bson.M{"shopid": shopid, "templatecode": templatecode}).All(&rs)
-	configs := make(map[string]models.TemplateConfig)
-	for _, config := range rs {
-		configs[config.Key] = config
-	}
+
 	c3mcommon.CheckError("get template configs", err)
-	return configs
+	return rs
 }
 func GetTemplateConfigByKey(shopid, templatecode, key string) models.TemplateConfig {
 	col := db.C("configs")
@@ -169,7 +166,7 @@ func UpdateInstallID(userid string, shop models.Shop, template models.Template) 
 func GetAllTemplates() []models.Template {
 	col := db.C("templates")
 	var rs []models.Template
-	err := col.Find(bson.M{"status": 1}).Select(bson.M{"code": 1, "title": 1, "screenshot": 1, "installedid": 1}).All(&rs)
+	err := col.Find(bson.M{"status": 1}).Select(bson.M{"code": 1, "title": 1, "screenshot": 1, "installedid": 1, "activedid": 1}).All(&rs)
 	c3mcommon.CheckError("get all templates", err)
 	return rs
 }

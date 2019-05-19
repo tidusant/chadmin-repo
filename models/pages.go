@@ -18,6 +18,7 @@ type Page struct {
 	Modified     time.Time           `bson:"modified"`
 	LangLinks    []LangLink          `bson:"langlinks"`
 	Blocks       []PageBlock         `bson:blocks`
+	Seo          string              `bson:"seo"`
 }
 
 //NewsLang ...
