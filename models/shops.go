@@ -8,32 +8,34 @@ import (
 
 type Shop struct {
 	ID      bson.ObjectId `bson:"_id,omitempty"`
-	Users   []ShopUser    `bson:"users"`
+	Users   []string      `bson:"users"`
 	Name    string        `bson:"name"`
 	Phone   string        `bson:"phone"`
 	Created time.Time     `bson:"created"`
-	Albums  []ShopAlbum   `bson:"albums"`
-	Theme   string        `bson:"theme"`
 	Config  ShopConfigs   `bson:"config"`
+	Status  int           `bson:"status"`
+	Theme   string        `bson:"theme"`
 }
 
 type ShopConfigs struct {
-	Title       string   `bson:"title"`
-	Description string   `bson:"description"`
-	Avatar      string   `bson:"avatar"`
 	Multilang   bool     `bson:"multilang"`
+	UserDomain  bool     `bson:"userdomain"`
+	Type        bool     `bons:"type"`
 	Langs       []string `bson:"langs"`
-	Defaultlang string   `bson:"defaultlang"`
-	CurrentLang string   `bson:"currentlang"`
+	DefaultLang string   `bson:"defaultlang"`
+}
+type ShopLimit struct {
+	ID     bson.ObjectId `bson:"_id,omitempty"`
+	ShopID string        `bson:"shopid"`
+	Key    string        `bson:"key"`
+	Value  int           `bson:"value"`
 }
 
-type ShopUser struct {
-	Id    string `bson:"userid"`
-	Level string `bson:"level"`
-}
 type ShopAlbum struct {
-	Slug    string    `bson:"slug"`
-	Name    string    `bson:"name"`
-	UserId  string    `bson:"userid"`
-	Created time.Time `bson:"created"`
+	ID      bson.ObjectId `bson:"_id,omitempty"`
+	Slug    string        `bson:"slug"`
+	Name    string        `bson:"name"`
+	UserId  string        `bson:"userid"`
+	ShopID  string        `bson:"shopid"`
+	Created time.Time     `bson:"created"`
 }

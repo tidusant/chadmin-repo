@@ -1,6 +1,8 @@
 package cuahang
 
 import (
+	"time"
+
 	"github.com/tidusant/c3m-common/c3mcommon"
 	"github.com/tidusant/chadmin-repo/models"
 
@@ -14,7 +16,7 @@ import (
 
 func SaveNews(newitem *models.News) string {
 
-	col := db.C("addons_news")
+	col := db.C("news")
 
 	// if prod.Code {
 
@@ -25,6 +27,7 @@ func SaveNews(newitem *models.News) string {
 		if newitem.ID == "" {
 			newitem.ID = bson.NewObjectId()
 		}
+		newitem.Modified = time.Now()
 		_, err := col.UpsertId(newitem.ID, &newitem)
 		c3mcommon.CheckError("news Update", err)
 	} else {
@@ -38,13 +41,18 @@ func SaveNews(newitem *models.News) string {
 
 	}
 	langinfo, _ := json.Marshal(newitem.Langs)
-	return "{\"Code\":\"" + newitem.Code + "\",\"Langs\":" + string(langinfo) + "}"
+	return "{\"Langs\":" + string(langinfo) + "}"
 }
-func GetAllNews(userid, shopid string) []models.News {
-	col := db.C("addons_news")
+func RemoveNews(item models.News) bool {
+	col := db.C("news")
+	err := col.RemoveId(item.ID)
+	return c3mcommon.CheckError("RemoveNews "+item.ID.Hex(), err)
+}
+func GetAllNews(shopid string) []models.News {
+	col := db.C("news")
 	var rs []models.News
-	shop := GetShopById(userid, shopid)
-	err := col.Find(bson.M{"shopid": shop.ID.Hex()}).All(&rs)
+
+	err := col.Find(bson.M{"shopid": shopid}).Sort("-_id").All(&rs)
 	c3mcommon.CheckError("get all news", err)
 	return rs
 }
@@ -57,21 +65,21 @@ func GetDemoNews() []models.News {
 	return rs
 }
 
-func GetNewsByCode(userid, shopid, code string) models.News {
-	col := db.C("addons_news")
+func GetNewsByID(userid, shopid, id string) models.News {
+	col := db.C("news")
+
 	var rs models.News
-	cond := bson.M{"shopid": shopid, "code": code}
-	if userid != "594f665df54c58a2udfl54d3er" {
-		cond["userid"] = userid
+	if bson.IsObjectIdHex(id) {
+		cond := bson.M{"shopid": shopid, "_id": bson.ObjectIdHex(id)}
+		err := col.Find(cond).One(&rs)
+		c3mcommon.CheckError("GetNewsByID", err)
 	}
-	err := col.Find(cond).One(&rs)
-	c3mcommon.CheckError("getnewbycode", err)
 
 	return rs
 
 }
 func GetNewsByCatId(userid, shopid, catcode string) []models.Product {
-	col := db.C("addons_news")
+	col := db.C("news")
 	var rs []models.Product
 
 	err := col.Find(bson.M{"userid": userid, "shopid": shopid, "catid": catcode}).All(&rs)
@@ -83,7 +91,7 @@ func GetNewsByCatId(userid, shopid, catcode string) []models.Product {
 
 //=========================cat function==================
 func SaveNewsCat(cat *models.NewsCat) string {
-	col := db.C("addons_newscats")
+	col := db.C("newscategories")
 	if len(cat.Langs) > 0 {
 		if cat.ID == "" {
 			cat.ID = bson.NewObjectId()
@@ -93,7 +101,7 @@ func SaveNewsCat(cat *models.NewsCat) string {
 		col.RemoveId(cat.ID)
 	}
 	langinfo, _ := json.Marshal(cat.Langs)
-	return "{\"Code\":\"" + cat.Code + "\",\"Langs\":" + string(langinfo) + "}"
+	return "{\"Langs\":" + string(langinfo) + "}"
 }
 func GetDemoNewsCats() []models.NewsCat {
 	col := db.C("addons_newscats")
@@ -103,22 +111,26 @@ func GetDemoNewsCats() []models.NewsCat {
 	c3mcommon.CheckError("getcatprod", err)
 	return rs
 }
-func GetAllNewsCats(userid, shopid string) []models.NewsCat {
-	col := db.C("addons_newscats")
+func GetAllNewsCats(shopid string) []models.NewsCat {
+	col := db.C("newscategories")
 	var rs []models.NewsCat
 	cond := bson.M{"shopid": shopid}
-	if userid != "594f665df54c58a2udfl54d3er" {
-		cond["userid"] = userid
-	}
 	err := col.Find(cond).Sort("-created").All(&rs)
 	c3mcommon.CheckError("getcat ", err)
 	return rs
 }
 
-func GetNewsCatByCode(userid, shopid, code string) models.NewsCat {
-	col := db.C("addons_newscats")
+func GetSubCatsByID(shopid, code string) []models.NewsCat {
+	col := db.C("newscategories")
+	var rs []models.NewsCat
+	err := col.Find(bson.M{"shopid": shopid, "parentid": code}).All(&rs)
+	c3mcommon.CheckError("GetSubCatsByID", err)
+	return rs
+}
+func GetNewsCatByID(shopid, catid string) models.NewsCat {
+	col := db.C("newscategories")
 	var rs models.NewsCat
-	err := col.Find(bson.M{"shopid": shopid, "code": code}).One(&rs)
-	c3mcommon.CheckError("GetNewsCatByCode", err)
+	err := col.Find(bson.M{"shopid": shopid, "_id": bson.ObjectIdHex(catid)}).One(&rs)
+	c3mcommon.CheckError("GetNewsCatByID", err)
 	return rs
 }

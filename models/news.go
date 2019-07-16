@@ -8,14 +8,12 @@ import (
 
 //News ...
 type News struct {
-	ID   bson.ObjectId `bson:"_id,omitempty"`
-	Code string        `bson:"code"`
-
+	ID       bson.ObjectId        `bson:"_id,omitempty"`
+	Avatar   string               `bson:"avatar"`
 	UserID   string               `bson:"userid"`
 	ShopID   string               `bson:"shopid"`
-	CatID    string               `bson:"catid"`
+	CatIDs   []string             `bson:"catids"`
 	Langs    map[string]*PageLang `bson:"langs"`
-	Status   string               `bson:"status"`
 	Created  time.Time            `bson:"created"`
 	Modified time.Time            `bson:"modified"`
 	Publish  bool                 `bson:"publish"`
@@ -27,11 +25,17 @@ type News struct {
 
 //NewsCat ...
 type NewsCat struct {
-	ID        bson.ObjectId        `bson:"_id,omitempty"`
-	Code      string               `bson:"code"`
-	UserId    string               `bson:"userid"`
-	ShopId    string               `bson:"shopid"`
-	Created   time.Time            `bson:"created"`
-	Langs     map[string]*PageLang `bson:"langs"`
-	LangLinks []LangLink           `bson:"langlinks"`
+	ID      bson.ObjectId        `bson:"_id,omitempty"`
+	Avatar  string               `bson:"avatar"`
+	UserId  string               `bson:"userid"`
+	ShopId  string               `bson:"shopid"`
+	Created time.Time            `bson:"created"`
+	Langs   map[string]*PageLang `bson:"langs"`
+
+	ParentId string `bson:"parentid"`
+	Publish  bool   `bson:"publish"`
+	Home     bool   `bson:"home"`
+	Feature  bool   `bson:"feature"`
+
+	LangLinks []LangLink `bson:"langlinks"`
 }

@@ -20,8 +20,8 @@ import (
 func GetLogin(session, userIP string) string {
 	coluserlogin := db.C("addons_userlogin")
 	var rs models.UserLogin
-	coluserlogin.Find(bson.M{"session": session}).One(&rs)
-	log.Debugf("user aut find:%v", rs)
+	coluserlogin.Find(bson.M{"session": session, "ip": userIP}).One(&rs)
+
 	userid := rs.UserId.Hex()
 	if userid == "" {
 		return ""

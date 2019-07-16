@@ -29,10 +29,10 @@ func init() {
 }
 
 //query and update https://stackoverflow.com/questions/11417784/mongodb-in-go-golang-with-mgo-how-do-i-update-a-record-find-out-if-update-wa
-func CreateBuild(bs models.BuildScript) string {
+func CreateBuild(shopid string, bs models.BuildScript) string {
 	col := db.C("builds")
 	//remove old build
-	cond := bson.M{"object": bs.Object, "shopid": bs.ShopId, "objectid": bs.ObjectId}
+	cond := bson.M{"object": bs.Object, "shopconfig.shopid": shopid, "objectid": bs.ObjectId}
 	//"objectid": buildscript.ObjectID, "collection": buildscript.Collection}
 
 	_, err := col.RemoveAll(cond)
@@ -58,19 +58,7 @@ func GetBuild() models.BuildScript {
 	return bs
 
 }
-func SaveConfig(config models.BuildConfig) {
-	col := db.C("configs")
-	//check  exist:
 
-	var oldcf models.BuildConfig
-	err := col.Find(bson.M{"shopid": config.ShopId}).One(&oldcf)
-	if oldcf.ID.Hex() == "" {
-		return
-	}
-	config.ID = oldcf.ID
-	_, err = col.UpsertId(config.ID, config)
-	c3mcommon.CheckError("UpsertId SaveConfig", err)
-}
 func RemoveAllBuild(shopID string) string {
 	col := db.C("builds")
 	cond := bson.M{"shopid": shopID}

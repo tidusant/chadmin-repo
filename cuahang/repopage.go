@@ -1,10 +1,11 @@
-package template
+package cuahang
 
 import (
 	"encoding/json"
 	"time"
 
 	"github.com/tidusant/c3m-common/c3mcommon"
+	"github.com/tidusant/c3m-common/log"
 	"github.com/tidusant/chadmin-repo/models"
 
 	//	"c3m/log"
@@ -112,4 +113,34 @@ func GetPageByCode(templatecode, shopid, code string) models.Page {
 	err := col.Find(cond).One(&rs)
 	c3mcommon.CheckError("GetPageByCode shopid:"+shopid+" code:"+code+" templatecode:"+templatecode, err)
 	return rs
+}
+func InsertPage(item models.Page) {
+	col := db.C("pages")
+	//check  exist:
+	cond := bson.M{"shopid": item.ShopID, "templatecode": item.TemplateCode, "code": item.Code}
+	var oldrs models.Resource
+	col.Find(cond).One(&oldrs)
+	if oldrs.ID.Hex() != "" {
+		//skip if exist
+		log.Debugf("exist, skip")
+		return
+	}
+	err := col.Insert(item)
+	c3mcommon.CheckError("Insert Page "+item.Code+" template:"+item.TemplateCode, err)
+
+}
+
+func RemoveOldTemplatePage(shop models.Shop, template models.Template) {
+	//remove old config
+	colcfg := db.C("pages")
+	cond := bson.M{"shopid": shop.ID.Hex(), "templatecode": template.Code}
+	_, err := colcfg.RemoveAll(cond)
+	c3mcommon.CheckError("remove old template page,shopid:"+shop.ID.Hex()+",templatecode:"+template.Code, err)
+}
+func RemoveUnusedTemplatePage(shop models.Shop, template models.Template, installedPages []string) {
+	//remove old config
+	colcfg := db.C("pages")
+	cond := bson.M{"shopid": shop.ID.Hex(), "templatecode": template.Code, "code": bson.M{"$nin": installedPages}}
+	_, err := colcfg.RemoveAll(cond)
+	c3mcommon.CheckError("remove old template page,shopid:"+shop.ID.Hex()+",templatecode:"+template.Code, err)
 }

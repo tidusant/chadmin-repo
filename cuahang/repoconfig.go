@@ -19,13 +19,13 @@ func GetTemplateLang(shopid, templatecode, lang string) []models.TemplateLang {
 	return rs
 }
 
-func SaveConfigs(newitem models.TemplateConfig) {
-	col := db.C("addons_configs")
+func SaveShopConfig(shop models.Shop) {
+	col := db.C("addons_shops")
+	//check  exist:
+	cond := bson.M{"_id": shop.ID}
+	change := bson.M{"$set": bson.M{"config": shop.Config}}
+	err := col.Update(cond, change)
 
-	if newitem.ID == "" {
-		newitem.ID = bson.NewObjectId()
-	}
-	_, err := col.UpsertId(newitem.ID, &newitem)
-	c3mcommon.CheckError("save template configs", err)
+	c3mcommon.CheckError("SaveShopConfig :", err)
 
 }

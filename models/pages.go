@@ -35,12 +35,12 @@ type PageBlockItem struct {
 
 //NewsLang ...
 type PageLang struct {
-	Avatar      string `bson:"avatar"`
 	Title       string `bson:"title"`
 	Name        string `bson:"name"`
 	Content     string `bson:"content"`
 	Description string `bson:"description"`
 	Slug        string `bson:"slug"`
+	Catname     string
 }
 
 type PageView struct {

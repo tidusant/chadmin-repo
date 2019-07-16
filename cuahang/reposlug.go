@@ -116,14 +116,11 @@ func SaveSlugNoBuild(newslug models.Slug) string {
 	return newslug.Slug
 }
 
-func RemoveSlug(slug models.Slug) bool {
+func RemoveSlug(slug string) bool {
 	col := db.C("addons_slugs")
-	if slug.ShopId == "" || slug.Object == "" {
-		return false
-	}
-
-	err := col.RemoveId(slug.ID)
-	return c3mcommon.CheckError("RemoveSlug "+slug.Slug, err)
+	cond := bson.M{"slug": slug}
+	err := col.Remove(cond)
+	return c3mcommon.CheckError("RemoveSlug "+slug, err)
 
 }
 
