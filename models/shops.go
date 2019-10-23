@@ -7,15 +7,14 @@ import (
 )
 
 type Shop struct {
-	ID      bson.ObjectId   `bson:"_id,omitempty"`
-	Users   []string        `bson:"users"`
-	Name    string          `bson:"name"`
-	Phone   string          `bson:"phone"`
-	Created time.Time       `bson:"created"`
-	Config  ShopConfigs     `bson:"config"`
-	Status  int             `bson:"status"`
-	Theme   string          `bson:"theme"`
-	Modules map[string]bool `bson:"modules"`
+	ID      bson.ObjectId `bson:"_id,omitempty"`
+	Users   []string      `bson:"users"`
+	Name    string        `bson:"name"`
+	Phone   string        `bson:"phone"`
+	Created time.Time     `bson:"created"`
+	Config  ShopConfigs   `bson:"config"`
+	Status  int           `bson:"status"`
+	Theme   string        `bson:"theme"`
 }
 
 type ShopConfigs struct {
