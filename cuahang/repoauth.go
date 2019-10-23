@@ -17,6 +17,13 @@ import (
 *sdf
 =============================================================================
 */
+
+func GetUserInfo(UserId string) models.User {
+	col := db.C("addons_users")
+	var rs models.User
+	col.Find(bson.M{"_id": bson.ObjectIdHex(UserId)}).One(&rs)
+	return rs
+}
 func GetLogin(session, userIP string) string {
 	coluserlogin := db.C("addons_userlogin")
 	var rs models.UserLogin
@@ -71,5 +78,11 @@ func Login(user, pass, session, userIP string) string {
 		return result.User
 	}
 	return ""
+}
+func Logout(user, session string) string {
 
+	col := db.C("addons_userlogin")
+	col.Remove(bson.M{"session": session})
+
+	return ""
 }
