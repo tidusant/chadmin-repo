@@ -32,7 +32,7 @@ func init() {
 func CreateBuild(shopid string, bs models.BuildScript) string {
 	col := db.C("builds")
 	//remove old build
-	cond := bson.M{"object": bs.Object, "shopconfig.shopid": shopid, "objectid": bs.ObjectId}
+	cond := bson.M{"object": bs.Object, "shopid": shopid, "objectid": bs.ObjectId}
 	//"objectid": buildscript.ObjectID, "collection": buildscript.Collection}
 
 	_, err := col.RemoveAll(cond)

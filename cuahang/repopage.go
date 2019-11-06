@@ -5,7 +5,6 @@ import (
 	"time"
 
 	"github.com/tidusant/c3m-common/c3mcommon"
-	"github.com/tidusant/c3m-common/log"
 	"github.com/tidusant/chadmin-repo/models"
 
 	//	"c3m/log"
@@ -118,11 +117,35 @@ func InsertPage(item models.Page) {
 	col := db.C("pages")
 	//check  exist:
 	cond := bson.M{"shopid": item.ShopID, "templatecode": item.TemplateCode, "code": item.Code}
-	var oldrs models.Resource
+	var oldrs models.Page
 	col.Find(cond).One(&oldrs)
 	if oldrs.ID.Hex() != "" {
-		//skip if exist
-		log.Debugf("exist, skip")
+		//get map block of old page
+		mapblocks := make(map[string]models.PageBlock)
+		for _, block := range oldrs.Blocks {
+			mapblocks[block.Name] = block
+		}
+
+		for i, block := range item.Blocks {
+			//check block exist:
+			_, ok := mapblocks[block.Name]
+			if ok {
+				//get map item of old block
+				mapbitems := make(map[string]models.PageBlockItem)
+				for _, bitem := range mapblocks[block.Name].Items {
+					mapbitems[bitem.Key] = bitem
+				}
+
+				for bi, bitem := range block.Items {
+					//check if exist: keep old value
+					if _, ok := mapbitems[bitem.Key]; ok {
+						item.Blocks[i].Items[bi] = mapbitems[bitem.Key]
+					}
+				}
+			}
+		}
+		err := col.UpdateId(oldrs.ID, item)
+		c3mcommon.CheckError("Update Page "+item.Code+" template:"+item.TemplateCode, err)
 		return
 	}
 	err := col.Insert(item)

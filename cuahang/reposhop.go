@@ -20,7 +20,7 @@ func UpdateTheme(shopid, code string) string {
 	col := db.C("addons_shops")
 
 	change := bson.M{"$set": bson.M{"theme": code}}
-	err := col.UpdateId(shopid, change)
+	err := col.UpdateId(bson.ObjectIdHex(shopid), change)
 	c3mcommon.CheckError("update theme", err)
 
 	return code
