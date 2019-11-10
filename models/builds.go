@@ -34,6 +34,7 @@ type BuildConfig struct {
 	Domain      string        `bson:"domain"`
 	Host        string        `bson:"host"` //0: news, 1: building, 2: finish
 	Path        string        `bson:"path"`
+	ApiUrl      string        `bson:"apiurl"`
 	FTPUsername string        `bson:"ftpusername"`
 	FTPPassword string        `bson:"ftppassword"`
 }
