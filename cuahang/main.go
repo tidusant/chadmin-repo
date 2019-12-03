@@ -79,7 +79,7 @@ func CreateCommonDataBuild(usex models.UserSession) string {
 func Rebuild(usex models.UserSession) {
 
 	CreateBuild("script", "", "", usex)
-	CreateBuild("image", "", "", usex)
+	//CreateBuild("image", "", "", usex)
 
 	//page build:
 	pages := GetAllPage(usex.Shop.Theme, usex.Shop.ID.Hex())
