@@ -11,6 +11,21 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
+func GetTemplateConfigs(shopid, templatecode string) []models.TemplateConfig {
+	col := db.C("addons_configs")
+	var rs []models.TemplateConfig
+	err := col.Find(bson.M{"shopid": shopid, "templatecode": templatecode}).All(&rs)
+	c3mcommon.CheckError("get template configs", err)
+	return rs
+}
+func GetTemplateConfigByKey(shopid, templatecode, key string) models.TemplateConfig {
+	col := db.C("addons_configs")
+	var rs models.TemplateConfig
+	err := col.Find(bson.M{"shopid": shopid, "templatecode": templatecode, "key": key}).One(&rs)
+	c3mcommon.CheckError("get template configs", err)
+	return rs
+}
+
 func GetTemplateLang(shopid, templatecode, lang string) []models.TemplateLang {
 	col := db.C("addons_langs")
 	var rs []models.TemplateLang
@@ -19,13 +34,13 @@ func GetTemplateLang(shopid, templatecode, lang string) []models.TemplateLang {
 	return rs
 }
 
-func SaveShopConfig(shop models.Shop) {
-	col := db.C("addons_shops")
-	//check  exist:
-	cond := bson.M{"_id": shop.ID}
-	change := bson.M{"$set": bson.M{"config": shop.Config}}
-	err := col.Update(cond, change)
+func SaveConfigs(newitem models.TemplateConfig) {
+	col := db.C("addons_configs")
 
-	c3mcommon.CheckError("SaveShopConfig :", err)
+	if newitem.ID == "" {
+		newitem.ID = bson.NewObjectId()
+	}
+	_, err := col.UpsertId(newitem.ID, &newitem)
+	c3mcommon.CheckError("save template configs", err)
 
 }

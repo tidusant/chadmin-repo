@@ -1,8 +1,6 @@
 package cuahang
 
 import (
-	"time"
-
 	"github.com/tidusant/c3m-common/c3mcommon"
 	"github.com/tidusant/c3m-common/log"
 	"github.com/tidusant/chadmin-repo/models"
@@ -16,14 +14,17 @@ import (
 /*for dashboard
 =============================================================================
 */
-func UpdateTheme(shopid, code string) string {
+func UpdateTheme(userid, shopid, code string) string {
 	col := db.C("addons_shops")
 
-	change := bson.M{"$set": bson.M{"theme": code}}
-	err := col.UpdateId(bson.ObjectIdHex(shopid), change)
-	c3mcommon.CheckError("update theme", err)
-
-	return code
+	shop := GetShopById(userid, shopid)
+	if shop.Name != "" {
+		log.Debugf("update login info:shopid %s", shop.ID.Hex())
+		change := bson.M{"$set": bson.M{"theme": code}}
+		err := col.UpdateId(shop.ID, change)
+		c3mcommon.CheckError("update theme", err)
+	}
+	return shop.Name
 }
 func LoadShopById(session, userid, shopid string) models.Shop {
 	col := db.C("addons_userlogin")
@@ -35,7 +36,7 @@ func LoadShopById(session, userid, shopid string) models.Shop {
 	if shop.Name != "" {
 		log.Debugf("update login info:shopid %s", shop.ID.Hex())
 		cond := bson.M{"session": session, "userid": bson.ObjectIdHex(userid)}
-		change := bson.M{"$set": bson.M{"shopid": shop.ID.Hex()}}
+		change := bson.M{"$set": bson.M{"shopid": shop.ID.Hex(), "shoplang": shop.Config.Defaultlang}}
 		col.Update(cond, change)
 	}
 	return shop
@@ -44,7 +45,7 @@ func GetShopDefault(userid string) string {
 	col := db.C("addons_shops")
 	var result models.Shop
 
-	col.Find(bson.M{"users": userid}).One(&result)
+	col.Find(bson.M{"users.id": userid}).One(&result)
 	if result.Name != "" {
 		return result.ID.Hex()
 	}
@@ -74,30 +75,10 @@ func GetShopById(userid, shopid string) models.Shop {
 	cond := bson.M{"_id": bson.ObjectIdHex(shopid)}
 
 	if userid != "594f665df54c58a2udfl54d3er" && userid != viper.GetString("config.webuserapi") {
-		cond["users"] = userid
+		cond["users.id"] = userid
 	}
 	coluser.Find(cond).One(&shop)
 	return shop
-}
-func GetShopLimitbyKey(shopid string, key string) int {
-
-	coluser := db.C("shoplimits")
-
-	cond := bson.M{"shopid": shopid, "key": key}
-	var rs models.ShopLimit
-	err := coluser.Find(cond).One(&rs)
-	c3mcommon.CheckError("GetShopConfigs :", err)
-	return rs.Value
-}
-func GetShopLimits(shopid string) []models.ShopLimit {
-
-	coluser := db.C("shoplimits")
-
-	cond := bson.M{"shopid": shopid}
-	var rs []models.ShopLimit
-	coluser.Find(cond).All(&rs)
-
-	return rs
 }
 func GetOtherShopById(userid, shopid string) []models.Shop {
 	coluser := db.C("addons_shops")
@@ -108,7 +89,7 @@ func GetOtherShopById(userid, shopid string) []models.Shop {
 	cond := bson.M{"_id": bson.M{"$ne": bson.ObjectIdHex(shopid)}}
 
 	if userid != "594f665df54c58a2udfl54d3er" && userid != viper.GetString("config.webuserapi") {
-		cond["users"] = userid
+		cond["users.id"] = userid
 	}
 	coluser.Find(cond).All(&shops)
 	return shops
@@ -242,31 +223,12 @@ func GetDemoShop() models.Shop {
 //	return rt
 
 //}
-// func SaveShopConfig(shop models.Shop) models.Shop {
-// 	coluser := db.C("addons_shops")
+func UpdateAlbum(shop models.Shop) models.Shop {
+	coluser := db.C("addons_shops")
 
-// 	cond := bson.M{"_id": shop.ID}
-// 	change := bson.M{"$set": bson.M{"config": shop.Config}}
+	cond := bson.M{"_id": shop.ID}
+	change := bson.M{"$set": bson.M{"albums": shop.Albums}}
 
-// 	coluser.Update(cond, change)
-// 	return shop
-// }
-func LoadAllShopAlbums(shopid string) []models.ShopAlbum {
-	col := db.C("shopalbums")
-	var rs []models.ShopAlbum
-	err := col.Find(bson.M{"shopid": shopid}).All(&rs)
-
-	c3mcommon.CheckError("get ShopAlbum", err)
-	return rs
-}
-func SaveAlbum(album models.ShopAlbum) models.ShopAlbum {
-	coluser := db.C("shopalbums")
-	if album.ID.Hex() == "" {
-		album.ID = bson.NewObjectId()
-		album.Created = time.Now()
-	}
-
-	_, err := coluser.UpsertId(album.ID, album)
-	c3mcommon.CheckError("SaveAlbum", err)
-	return album
+	coluser.Update(cond, change)
+	return shop
 }

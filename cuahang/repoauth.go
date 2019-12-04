@@ -17,18 +17,11 @@ import (
 *sdf
 =============================================================================
 */
-
-func GetUserInfo(UserId string) models.User {
-	col := db.C("addons_users")
-	var rs models.User
-	col.Find(bson.M{"_id": bson.ObjectIdHex(UserId)}).One(&rs)
-	return rs
-}
 func GetLogin(session, userIP string) string {
 	coluserlogin := db.C("addons_userlogin")
 	var rs models.UserLogin
-	coluserlogin.Find(bson.M{"session": session, "ip": userIP}).One(&rs)
-
+	coluserlogin.Find(bson.M{"session": session}).One(&rs)
+	log.Debugf("user aut find:%v", rs)
 	userid := rs.UserId.Hex()
 	if userid == "" {
 		return ""
@@ -75,14 +68,8 @@ func Login(user, pass, session, userIP string) string {
 
 		_, err := coluserlogin.UpsertId(userlogin.UserId, &userlogin)
 		c3mcommon.CheckError("Upsert login", err)
-		return result.User
+		return result.Name
 	}
 	return ""
-}
-func Logout(user, session string) string {
 
-	col := db.C("addons_userlogin")
-	col.Remove(bson.M{"session": session})
-
-	return ""
 }

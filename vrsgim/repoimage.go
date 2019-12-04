@@ -1,7 +1,6 @@
 package cuahang
 
 import (
-	"github.com/spf13/viper"
 	"github.com/tidusant/c3m-common/c3mcommon"
 	"github.com/tidusant/chadmin-repo/models"
 
@@ -29,47 +28,44 @@ func SaveImages(images []models.CHImage) string {
 
 	return "1"
 }
-func SaveImage(image models.CHImage) string {
-	col := db.C("files")
-	err := col.Insert(image)
-	c3mcommon.CheckError("insert SaveImage", err)
 
-	return "1"
-}
 func ImageCount(shopid string) int {
 	col := db.C("files")
 	count := -1
-	count, err := col.Find(bson.M{"shopid": shopid, "appname": viper.GetString("config.appname")}).Count()
+	count, err := col.Find(bson.M{"shopid": shopid, "appname": "chadmin"}).Count()
 	c3mcommon.CheckError("image count error", err)
 
 	return count
 }
 
-func RemoveImage(shopid, filename string) bool {
+func RemoveImage(shopid, userid, filename string) bool {
 	col := db.C("files")
 	cond := bson.M{"filename": filename}
 	var image models.CHImage
 	err := col.Find(cond).One(&image)
 	if image.Shopid == shopid && image.Filename == filename {
-
-		err = col.Remove(bson.M{"filename": filename, "shopid": shopid})
-		if c3mcommon.CheckError("remove image", err) {
-			return true
+		if userid == "1" || image.Uid == userid {
+			err = col.Remove(bson.M{"filename": filename, "shopid": shopid})
+			if c3mcommon.CheckError("remove image", err) {
+				return true
+			}
 		}
-
 	}
 
 	return false
 }
 
-func GetImages(shopid, albumid string) []models.CHImage {
+func GetImages(shopid, userid, album string) []models.CHImage {
 	col := db.C("files")
 	var rs []models.CHImage
 	cond := bson.M{}
+	if userid == "1" {
+		cond = bson.M{"shopid": shopid, "albumname": album, "appname": "chadmin"}
 
-	cond = bson.M{"shopid": shopid, "albumid": albumid, "appname": "chadmin"}
-
+	} else {
+		cond = bson.M{"shopid": shopid, "albumname": album, "appname": "chadmin"}
+	}
 	err := col.Find(cond).All(&rs)
-	c3mcommon.CheckError("error get images shopid:"+shopid+" albumid:"+albumid, err)
+	c3mcommon.CheckError("error get images shopid:"+shopid+" userid:"+userid+" album:"+album, err)
 	return rs
 }

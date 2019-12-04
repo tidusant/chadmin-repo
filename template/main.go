@@ -1,16 +1,29 @@
-package builder
+package template
 
 import (
+	"os"
 
-	//	"c3m/log"
-
-	//"strings"
 	"github.com/tidusant/c3m-common/c3mcommon"
-
+	"github.com/tidusant/c3m-common/log"
 	"github.com/tidusant/chadmin-repo/models"
 
+	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
+
+var (
+	db *mgo.Database
+)
+
+func init() {
+	log.Infof("init repo template")
+	strErr := ""
+	db, strErr = c3mcommon.ConnectDB("chtemplate")
+	if strErr != "" {
+		log.Infof(strErr)
+		os.Exit(1)
+	}
+}
 
 func AuthByKey(key string) models.User {
 
@@ -23,7 +36,7 @@ func AuthByKey(key string) models.User {
 	// } else {
 	var rs models.User
 	err := col.Find(bson.M{"keypair": key}).One(&rs)
-	c3mcommon.CheckError("AuthByKey", err)
+	c3mcommon.CheckError("getcatbycode", err)
 	return rs
 }
 
@@ -45,33 +58,27 @@ func ActiveTemplate(userid, shopid string, template, oldtemplate models.Template
 	return template.Code
 
 }
-func UpdateActiveID(templatecode string, ActiveIDs []string) string {
 
+func InstallTemplate(userid, shopid string, template models.Template) string {
+
+	if userid == "" || shopid == "" {
+		return ""
+	}
 	col := db.C("templates")
 
-	cond := bson.M{"status": 1, "code": templatecode}
-	change := bson.M{"$set": bson.M{"activedid": ActiveIDs}}
+	cond := bson.M{"status": 1, "code": template.Code}
+	change := bson.M{"$set": bson.M{"installedid": template.InstalledIDs}}
 	err := col.Update(cond, change)
-	c3mcommon.CheckError("UpdateActiveID template", err)
-
-	return templatecode
-}
-func UpdateInstallID(templatecode string, InstalledIDs []string) string {
-
-	col := db.C("templates")
-
-	cond := bson.M{"status": 1, "code": templatecode}
-	change := bson.M{"$set": bson.M{"installedid": InstalledIDs}}
-	err := col.Update(cond, change)
-	c3mcommon.CheckError("install template", err)
-
-	return templatecode
+	if c3mcommon.CheckError("install template", err) {
+		return template.Code
+	}
+	return ""
 }
 
-func GetAllTemplates() []models.Template {
+func GetAllTemplates(userid, shopid string) []models.Template {
 	col := db.C("templates")
 	var rs []models.Template
-	err := col.Find(bson.M{"status": 1}).Select(bson.M{"code": 1, "title": 1, "screenshot": 1, "installedid": 1, "activedid": 1}).All(&rs)
+	err := col.Find(bson.M{"status": 1, "installedid": bson.M{"$ne": shopid}}).Select(bson.M{"code": 1, "title": 1, "screenshot": 1}).All(&rs)
 	c3mcommon.CheckError("get all templates", err)
 	return rs
 }
@@ -124,11 +131,11 @@ func GetAllTemplatesCode() map[string]string {
 	return rt
 }
 
-func CheckTemplateDup(TemplateTitle string) bool {
+func CheckTemplateDup(templ models.Template) bool {
 	count := 0
 	col := db.C("templates")
 	var cond bson.M
-	cond = bson.M{"title": TemplateTitle}
+	cond = bson.M{"title": templ.Title}
 	count, err := col.Find(cond).Count()
 	if c3mcommon.CheckError("CheckTemplateDup", err) && count == 0 {
 		return true
