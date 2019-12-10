@@ -78,7 +78,7 @@ func CheckRequest(uri, useragent, referrer, remoteAddress, requestType string) b
 			c3mcommon.CheckError("checkRequest Insert", err)
 			return true
 		} else {
-			log.Debugf("request ip limited %s", uri)
+			log.Debugf("old request ip limited %s", uri)
 		}
 	} else {
 		log.Debugf("request limited %s", uri)
