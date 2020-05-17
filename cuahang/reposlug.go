@@ -7,7 +7,7 @@ import (
 	"github.com/tidusant/c3m-common/log"
 	"github.com/tidusant/chadmin-repo/models"
 	"gopkg.in/mgo.v2/bson"
-	//"c3m/apps/common"
+	//"c3m/apps/commo
 )
 
 func SaveSlug(newslug models.Slug) string {

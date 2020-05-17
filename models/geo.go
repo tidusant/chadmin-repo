@@ -1,7 +1,7 @@
 package models
 
 import (
-	"gopkg.in/mgo.v2/bson"
+	"gopkg.in/mgo.v2/bson" //
 )
 
 type City struct {
