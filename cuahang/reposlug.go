@@ -121,7 +121,6 @@ func RemoveSlug(slug string) bool {
 	cond := bson.M{"slug": slug}
 	err := col.Remove(cond)
 	return c3mcommon.CheckError("RemoveSlug "+slug, err)
-
 }
 
 func GetAllSlugs(shopid string) []models.Slug {
