@@ -1,4 +1,4 @@
-package cuahang
+package vrsgim
 
 import (
 	"github.com/spf13/viper"

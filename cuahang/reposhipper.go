@@ -4,12 +4,11 @@ import (
 	"time"
 
 	"github.com/tidusant/c3m-common/c3mcommon"
-	"github.com/tidusant/chadmin-repo/models"
 
 	"gopkg.in/mgo.v2/bson"
 )
 
-func GetAllShipper(shopid string) []models.Shipper {
+func GetAllShipper(shopid string) []Shipper {
 	col := db.C("addons_shippers")
 	var rs []models.Shipper
 	cond := bson.M{"shopid": shopid}
