@@ -30,13 +30,14 @@ func LoadShopById(session, userid, shopid string) models.Shop {
 	col := db.C("addons_userlogin")
 	if shopid == "" {
 		//get first shop
+
 		shopid = GetShopDefault(userid)
 	}
 	shop := GetShopById(userid, shopid)
 	if shop.Name != "" {
 		log.Debugf("update login info:shopid %s", shop.ID.Hex())
 		cond := bson.M{"session": session, "userid": bson.ObjectIdHex(userid)}
-		change := bson.M{"$set": bson.M{"shopid": shop.ID.Hex(), "shoplang": shop.Config.Defaultlang}}
+		change := bson.M{"$set": bson.M{"shopid": shop.ID.Hex(), "shoplang": shop.Config.DefaultLang}}
 		col.Update(cond, change)
 	}
 	return shop
@@ -225,7 +226,6 @@ func GetDemoShop() models.Shop {
 //}
 func UpdateAlbum(shop models.Shop) models.Shop {
 	coluser := db.C("addons_shops")
-
 	cond := bson.M{"_id": shop.ID}
 	change := bson.M{"$set": bson.M{"albums": shop.Albums}}
 

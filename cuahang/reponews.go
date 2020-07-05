@@ -16,7 +16,6 @@ func SaveNews(newitem models.News) string {
 	col := db.C("addons_news")
 
 	// if prod.Code {
-
 	// 	err := col.Insert(prod)
 	// 	c3mcommon.CheckError("product Insert", err)
 	// } else {
@@ -38,6 +37,7 @@ func SaveNews(newitem models.News) string {
 }
 func GetAllNews(userid, shopid string) []models.News {
 	col := db.C("addons_news")
+
 	var rs []models.News
 	shop := GetShopById(userid, shopid)
 	err := col.Find(bson.M{"shopid": shop.ID.Hex()}).All(&rs)

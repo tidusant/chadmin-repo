@@ -49,7 +49,7 @@ type ShopConfigs struct {
 
 	Multilang   bool     `bson:"multilang"`
 	Langs       []string `bson:"langs"`
-	Defaultlang string   `bson:"defaultlang"`
+	DefaultLang string   `bson:"defaultlang"`
 	CurrentLang string   `bson:"currentlang"`
 }
 

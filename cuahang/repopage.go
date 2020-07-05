@@ -7,7 +7,6 @@ import (
 	"github.com/tidusant/c3m-common/log"
 	"github.com/tidusant/chadmin-repo/models"
 	//	"c3m/log"
-
 	//"strings"
 
 	"gopkg.in/mgo.v2/bson"
@@ -21,14 +20,13 @@ func SavePage(newitem models.Page) string {
 	// if prod.Code {
 
 	// 	err := col.Insert(prod)
-	// 	c3mcommon.CheckError("product Insert", err)
+	// 	c3mcommon.CheckError ("product Insert", err)
 	// } else {
 
 	if len(newitem.Langs) > 0 {
 		if newitem.ID == "" {
 			newitem.ID = bson.NewObjectId()
 		}
-
 		//slug
 		//get all slug
 		slugs := GetAllSlug(newitem.UserID, newitem.ShopID)
@@ -37,7 +35,8 @@ func SavePage(newitem models.Page) string {
 			mapslugs[slugs[i]] = slugs[i]
 		}
 		for lang, _ := range newitem.Langs {
-			if newitem.Langs[lang].Title != "" {
+			itemlang := newitem.Langs[lang]
+			if itemlang.Title != "" {
 				//newslug
 				// tb, _ := lzjs.DecompressFromBase64(newitem.Langs[lang].Title)
 				// newslug := inflect.Parameterize(string(tb))
@@ -58,11 +57,13 @@ func SavePage(newitem models.Page) string {
 				// }
 				//remove oldslug
 				log.Debugf("page slug for lang %s,%v", lang, newitem.Langs[lang])
-				newitem.Langs[lang].Slug = newitem.Code
-				CreateSlug(newitem.Langs[lang].Slug, newitem.ShopID, "page")
+
+				itemlang.Slug = newitem.Code
+				CreateSlug(itemlang.Slug, newitem.ShopID, "page")
 			} else {
 				delete(newitem.Langs, lang)
 			}
+			newitem.Langs[lang] = itemlang
 		}
 
 		_, err := col.UpsertId(newitem.ID, &newitem)
@@ -73,7 +74,9 @@ func SavePage(newitem models.Page) string {
 
 	//}
 	for lang, _ := range newitem.Langs {
-		newitem.Langs[lang].Content = ""
+		itemlang := newitem.Langs[lang]
+		itemlang.Content = ""
+		newitem.Langs[lang] = itemlang
 	}
 	langinfo, _ := json.Marshal(newitem.Langs)
 	return "{\"Code\":\"" + newitem.Code + "\",\"Langs\":" + string(langinfo) + "}"
