@@ -1,1 +1,1 @@
-module github.com/tidusant/chadmin-repo/cuahang
+module github.com/tidusant/chadmin-repo
