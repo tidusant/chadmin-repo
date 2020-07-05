@@ -99,17 +99,6 @@ func GetDemoNewsCats() []models.NewsCat {
 	c3mcommon.CheckError("getcatprod", err)
 	return rs
 }
-func GetAllNewsCats(userid, shopid string) []models.NewsCat {
-	col := db.C("addons_newscats")
-	var rs []models.NewsCat
-	cond := bson.M{"shopid": shopid}
-	if userid != "594f665df54c58a2udfl54d3er" {
-		cond["userid"] = userid
-	}
-	err := col.Find(cond).Sort("-created").All(&rs)
-	c3mcommon.CheckError("getcat ", err)
-	return rs
-}
 
 func GetNewsCatByCode(userid, shopid, code string) models.NewsCat {
 	col := db.C("addons_newscats")
