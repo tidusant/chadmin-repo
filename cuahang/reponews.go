@@ -57,9 +57,9 @@ func GetNewsByCode(userid, shopid, code string) models.News {
 	col := db.C("addons_news")
 	var rs models.News
 	cond := bson.M{"shopid": shopid, "code": code}
-	if userid != "594f665df54c58a2udfl54d3er" {
-		cond["userid"] = userid
-	}
+	// if userid != "594f665df54c58a2udfl54d3er" {
+	// 	cond["userid"] = userid
+	// }
 	err := col.Find(cond).One(&rs)
 	c3mcommon.CheckError("getnewbycode", err)
 
@@ -103,9 +103,9 @@ func GetAllNewsCats(userid, shopid string) []models.NewsCat {
 	col := db.C("addons_newscats")
 	var rs []models.NewsCat
 	cond := bson.M{"shopid": shopid}
-	if userid != "594f665df54c58a2udfl54d3er" {
-		cond["userid"] = userid
-	}
+	// if userid != "594f665df54c58a2udfl54d3er" {
+	// 	cond["userid"] = userid
+	// }
 	err := col.Find(cond).Sort("-created").All(&rs)
 	c3mcommon.CheckError("getcat ", err)
 	return rs
