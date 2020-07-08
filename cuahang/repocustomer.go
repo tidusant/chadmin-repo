@@ -5,7 +5,6 @@ import (
 
 	"github.com/tidusant/c3m-common/c3mcommon"
 	"github.com/tidusant/chadmin-repo/models"
-
 	"gopkg.in/mgo.v2/bson"
 )
 
