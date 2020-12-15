@@ -3,12 +3,10 @@ package builder
 import (
 	"time"
 
-	"github.com/tidusant/chadmin-repo/models"
-
-	"os"
-
-	"github.com/tidusant/c3m-common/c3mcommon"
+	c3mcommon "github.com/tidusant/c3m-common/common"
 	"github.com/tidusant/c3m-common/log"
+	"github.com/tidusant/chadmin-repo/models"
+	"os"
 
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -19,13 +17,14 @@ var (
 )
 
 func init() {
-	log.Infof("init repo build")
+	log.Infof("init repo build...")
 	strErr := ""
 	db, strErr = c3mcommon.ConnectDB("chbuild")
 	if strErr != "" {
 		log.Infof(strErr)
 		os.Exit(1)
 	}
+	log.Info("done")
 }
 
 //query and update https://stackoverflow.com/questions/11417784/mongodb-in-go-golang-with-mgo-how-do-i-update-a-record-find-out-if-update-wa

@@ -1,11 +1,7 @@
 package builder
 
 import (
-
-	//	"c3m/log"
-
-	//"strings"
-	"github.com/tidusant/c3m-common/c3mcommon"
+	c3mcommon "github.com/tidusant/c3m-common/common"
 	"github.com/tidusant/c3m-common/log"
 	"github.com/tidusant/chadmin-repo/models"
 

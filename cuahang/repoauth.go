@@ -1,10 +1,12 @@
 package cuahang
 
 import (
+	"context"
 	"crypto/md5"
 	"encoding/hex"
+	"go.mongodb.org/mongo-driver/mongo/options"
 
-	"github.com/tidusant/c3m-common/c3mcommon"
+	c3mcommon "github.com/tidusant/c3m-common/common"
 	"github.com/tidusant/c3m-common/log"
 	"github.com/tidusant/chadmin-repo/models"
 
@@ -13,59 +15,63 @@ import (
 	"gopkg.in/mgo.v2/bson"
 )
 
-/*for authentication aaa
-*sdf
-=============================================================================
+/*
+Check login status by session and USERIP, return userId and shopid
 */
 
 func GetUserInfo(UserId string) models.User {
-	col := db.C("addons_users")
+	col := db.Collection("addons_users")
 	var rs models.User
-	col.Find(bson.M{"_id": bson.ObjectIdHex(UserId)}).One(&rs)
+	col.FindOne(context.TODO(), bson.M{"_id": bson.ObjectIdHex(UserId)}).Decode(&rs)
 	return rs
 }
-func GetLogin(session, userIP string) string {
-	coluserlogin := db.C("addons_userlogin")
-	var rs models.UserLogin
-	coluserlogin.Find(bson.M{"session": session, "ip": userIP}).One(&rs)
 
-	userid := rs.UserId.Hex()
-	if userid == "" {
-		return ""
-	}
+//get user login by session and return current shop and user id
+func GetLogin(session string) models.UserLogin {
+	coluserlogin := db.Collection("addons_userlogin")
+	var rs models.UserLogin
+	coluserlogin.FindOne(context.TODO(), bson.M{"session": session}).Decode(&rs)
 	if rs.ShopId == "" {
 		rs.ShopId = GetShopDefault(rs.UserId.Hex())
-		coluserlogin.UpsertId(rs.UserId, &rs)
+		filter := bson.D{{"userid", rs.UserId}}
+		update := bson.D{{"$set", bson.M{"shopid": rs.ShopId}}}
+		coluserlogin.UpdateOne(context.TODO(), filter, update)
 	}
-	return rs.UserId.Hex() + "[+]" + rs.ShopId
+	return rs
 }
-func UpdateShopLogin(session, ShopId string) bool {
-	coluserlogin := db.C("addons_userlogin")
+func UpdateShopLogin(session, ShopChangeId string) (shopchange models.Shop) {
+	coluserlogin := db.Collection("addons_userlogin")
 	var rs models.UserLogin
-	coluserlogin.Find(bson.M{"session": session}).One(&rs)
+	coluserlogin.FindOne(context.TODO(), bson.M{"session": session}).Decode(&rs)
 	if rs.UserId.Hex() == "" {
-		return false
+		return shopchange
 	}
 	//get shop id
-	shop := GetShopById(rs.UserId.Hex(), ShopId)
-	if rs.ID.Hex() == "" {
-		return false
+
+	shopchange = GetShopById(rs.UserId.Hex(), ShopChangeId)
+	if shopchange.ID.Hex() == "" {
+		return shopchange
 	}
-	rs.ShopId = shop.ID.Hex()
-	coluserlogin.UpsertId(rs.UserId, &rs)
-	return true
+	rs.ShopId = shopchange.ID.Hex()
+
+	filter := bson.D{{"userid", rs.UserId}}
+	update := bson.D{{"$set", bson.M{"shopid": rs.ShopId}}}
+	coluserlogin.UpdateOne(context.TODO(), filter, update)
+	return shopchange
 }
-func Login(user, pass, session, userIP string) string {
+
+//Login user and update session
+func Login(user, pass, session, userIP string) bool {
 	hash := md5.Sum([]byte(pass))
 	passmd5 := hex.EncodeToString(hash[:])
-	coluser := db.C("addons_users")
+	coluser := db.Collection("addons_users")
 	var result models.User
-	coluser.Find(bson.M{"user": user, "password": passmd5}).One(&result)
+	coluser.FindOne(context.TODO(), bson.M{"user": user, "password": passmd5}).Decode(&result)
 	log.Debugf("user result %v", result)
 	if result.Name != "" {
-		coluserlogin := db.C("addons_userlogin")
+		coluserlogin := db.Collection("addons_userlogin")
 		var userlogin models.UserLogin
-		coluserlogin.Find(bson.M{"userid": result.ID}).One(&userlogin)
+		coluserlogin.FindOne(context.TODO(), bson.M{"userid": result.ID}).Decode(&userlogin)
 		if userlogin.UserId.Hex() == "" {
 			userlogin.UserId = result.ID
 		}
@@ -73,16 +79,20 @@ func Login(user, pass, session, userIP string) string {
 		userlogin.LoginIP = userIP
 		userlogin.Session = session
 
-		_, err := coluserlogin.UpsertId(userlogin.UserId, &userlogin)
-		c3mcommon.CheckError("Upsert login", err)
-		return result.User
-	}
-	return ""
-}
-func Logout(user, session string) string {
+		opts := options.Update().SetUpsert(true)
+		filter := bson.D{{"userid", userlogin.UserId}}
+		update := bson.D{{"$set", userlogin}}
 
-	col := db.C("addons_userlogin")
-	col.Remove(bson.M{"session": session})
+		_, err := coluserlogin.UpdateOne(context.TODO(), filter, update, opts)
+		c3mcommon.CheckError("Upsert login", err)
+		return true
+	}
+	return false
+}
+func Logout(session string) string {
+
+	col := db.Collection("addons_userlogin")
+	col.DeleteOne(context.TODO(), bson.M{"session": session})
 
 	return ""
 }

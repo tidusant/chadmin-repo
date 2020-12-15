@@ -1,16 +1,17 @@
 package cuahang
 
-import (
-	"github.com/tidusant/c3m-common/c3mcommon"
-	"github.com/tidusant/chadmin-repo/models"
-	"gopkg.in/mgo.v2/bson"
-)
+//import (
+//	c3mcommon "colis/common/common"
+//
+//	"colis/models"
+//	"gopkg.in/mgo.v2/bson"
+//)
 
-func GetCities() []models.City {
-	col := db.C("geo_cities")
-	var rs []models.City
-
-	err := col.Find(bson.M{}).All(&rs)
-	c3mcommon.CheckError("get cities", err)
-	return rs
-}
+//func GetCities(source string) []models.City {
+//	col := db.Collection("geo_cities")
+//	var rs []models.City
+//
+//	err := col.Find(bson.M{"source":source}).All(&rs)
+//	c3mcommon.CheckError("get cities", err)
+//	return rs
+//}

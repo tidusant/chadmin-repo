@@ -11,6 +11,7 @@ type City struct {
 	Name      string              `bson:"name"`
 	Pid       string              `bson:"pid"`
 	Districts map[string]District `bson:districts`
+	Code string
 }
 
 type District struct {
@@ -21,6 +22,7 @@ type District struct {
 	IsPicked    bool            `bson:"is_picked"`
 	IsDelivered bool            `bson:"is_delivered"`
 	Wards       map[string]Ward `bson:wards`
+	Code string
 }
 
 type Ward struct {
@@ -30,4 +32,5 @@ type Ward struct {
 	Pid         string `bson:"pid"`
 	IsPicked    bool   `bson:"is_picked"`
 	IsDelivered bool   `bson:"is_delivered"`
+	Code string
 }

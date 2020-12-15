@@ -16,6 +16,7 @@ type Shop struct {
 	Status  int             `bson:"status"`
 	Theme   string          `bson:"theme"`
 	Modules map[string]bool `bson:"modules"`
+	Albums  ShopAlbum       `bson:"album"`
 }
 
 type ShopConfigs struct {

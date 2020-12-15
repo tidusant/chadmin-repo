@@ -1,37 +1,43 @@
 package session
 
 import (
+	"context"
+	"fmt"
+	"go.mongodb.org/mongo-driver/mongo"
 	"os"
+	"strconv"
+	"strings"
 	"time"
 
-	"github.com/spf13/viper"
-	"github.com/tidusant/c3m-common/c3mcommon"
+	c3mcommon "github.com/tidusant/c3m-common/common"
 	"github.com/tidusant/c3m-common/log"
 	"github.com/tidusant/c3m-common/mystring"
 	"github.com/tidusant/chadmin-repo/models"
 
-	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
 )
 
 var (
-	db *mgo.Database
+	db *mongo.Database
 )
 
 func init() {
-	log.Infof("init reposession")
+	fmt.Print("init repo session...")
 	strErr := ""
-	db, strErr = c3mcommon.ConnectDB("session")
+	db, strErr = c3mcommon.ConnectAtlasDB("session")
 	if strErr != "" {
 		log.Infof(strErr)
 		os.Exit(1)
 	}
+	fmt.Print("done\n")
 
 }
+
+//CreateSession: create session string and save into database
 func CreateSession() string {
 	sex := mystring.RandString(20)
-	col := db.C("sessions")
-	err := col.Insert(bson.M{"sex": sex, "created": time.Now().Unix(), "expired": time.Now().Unix() + 30*60})
+	col := db.Collection("sessions")
+	_, err := col.InsertOne(context.TODO(), bson.M{"sex": sex, "created": time.Now().Unix(), "expired": time.Now().Unix() + 30*60})
 	if c3mcommon.CheckError("Insert sessions", err) {
 		return sex
 	}
@@ -41,9 +47,9 @@ func CheckSession(s string) bool {
 	if s == "" {
 		return false
 	}
-	col := db.C("sessions")
+	col := db.Collection("sessions")
 	var result models.Session
-	err2 := col.Find(bson.M{"sex": s}).One(&result)
+	err2 := col.FindOne(context.TODO(), bson.M{"sex": s}).Decode(&result)
 
 	if err2 != nil {
 		log.Infof("Session not found sex '%s': %s\n", s, err2)
@@ -52,27 +58,32 @@ func CheckSession(s string) bool {
 			//update session
 			cond := bson.M{"_id": result.ID}
 			change := bson.M{"$set": bson.M{"expired": time.Now().Unix() + 30*60}}
-			col.Update(cond, change)
+			col.UpdateOne(context.TODO(), cond, change)
 			return true
 		} else {
 			//remove session
-			col.RemoveId(result.ID)
+			col.DeleteOne(context.TODO(), bson.M{"_id": result.ID})
 			log.Infof("Session expired: sex '%s'", s)
 			return false
 		}
 	}
 	return false
 }
+
+//CheckRequest: check request for anti ddos with request limit from env: REQUEST_LIMIT
 func CheckRequest(uri, useragent, referrer, remoteAddress, requestType string) bool {
-
-	col := db.C("requestUrls")
-
-	urlcount, _ := col.Find(bson.M{"uri": uri, "type": requestType, "created": bson.M{"$gt": int(time.Now().Unix()) - 1*3600}}).Count()
-	if urlcount <= viper.GetInt("config.sameurllimit") {
-		//check ip in 3 sec
-		urlcount, err := col.Find(bson.M{"remoteAddress": remoteAddress, "created": bson.M{"$gt": int(time.Now().Unix()) - 3}}).Count()
-		if urlcount < viper.GetInt("config.requestlimit") {
-			err = col.Insert(bson.M{"uri": uri, "created": int(time.Now().Unix()), "user-agent": useragent, "referer": referrer, "remoteAddress": remoteAddress, "type": requestType})
+	col := db.Collection("requestUrls")
+	//count same request url in 1 hour, if count>0 => already request => deny
+	urlcount, _ := col.CountDocuments(context.TODO(), bson.M{"uri": uri, "type": requestType, "created": bson.M{"$gt": int(time.Now().Unix()) - 1*3600}})
+	if urlcount == 0 {
+		//count url request of ip in 3 sec, if this ip request many time (requestlimit) => deny
+		requestlimit, _ := strconv.Atoi(strings.Trim(os.Getenv("REQUEST_LIMIT"), " "))
+		if requestlimit == 0 {
+			requestlimit = 100
+		}
+		urlcount, err := col.CountDocuments(context.TODO(), bson.M{"remoteAddress": remoteAddress, "created": bson.M{"$gt": int(time.Now().Unix()) - 3}})
+		if urlcount < int64(requestlimit) {
+			_, err = col.InsertOne(context.TODO(), bson.M{"uri": uri, "created": int(time.Now().Unix()), "user-agent": useragent, "referer": referrer, "remoteAddress": remoteAddress, "type": requestType})
 			c3mcommon.CheckError("checkRequest Insert", err)
 			return true
 		} else {
