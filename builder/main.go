@@ -3,7 +3,7 @@ package builder
 import (
 	"time"
 
-	c3mcommon "github.com/tidusant/c3m-common/common"
+	"github.com/tidusant/c3m-common/c3mcommon"
 	"github.com/tidusant/c3m-common/log"
 	"github.com/tidusant/chadmin-repo/models"
 	"os"

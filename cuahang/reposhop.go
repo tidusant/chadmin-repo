@@ -3,7 +3,7 @@ package cuahang
 import (
 	"context"
 	"github.com/spf13/viper"
-	c3mcommon "github.com/tidusant/c3m-common/common"
+	"github.com/tidusant/c3m-common/c3mcommon"
 	"github.com/tidusant/c3m-common/log"
 	"github.com/tidusant/chadmin-repo/models"
 	"gopkg.in/mgo.v2/bson"

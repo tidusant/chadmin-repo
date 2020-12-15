@@ -1,7 +1,7 @@
 package cuahang
 
 import (
-	c3mcommon "github.com/tidusant/c3m-common/common"
+	"github.com/tidusant/c3m-common/c3mcommon"
 
 	"context"
 	"github.com/tidusant/chadmin-repo/models"
