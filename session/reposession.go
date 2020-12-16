@@ -18,13 +18,16 @@ import (
 )
 
 var (
-	db *mongo.Database
+	db     *mongo.Database
+	ctx    context.Context
+	cancel context.CancelFunc
 )
 
 func init() {
 	fmt.Print("init repo session...")
 	strErr := ""
-	db, strErr = c3mcommon.ConnectAtlasDB("session")
+	ctx, cancel = context.WithCancel(context.Background())
+	db, strErr = c3mcommon.ConnectAtlasDB(ctx, "session")
 	if strErr != "" {
 		log.Infof(strErr)
 		os.Exit(1)
@@ -37,7 +40,7 @@ func init() {
 func CreateSession() string {
 	sex := mystring.RandString(20)
 	col := db.Collection("sessions")
-	_, err := col.InsertOne(context.TODO(), bson.M{"sex": sex, "created": time.Now().Unix(), "expired": time.Now().Unix() + 30*60})
+	_, err := col.InsertOne(ctx, bson.M{"sex": sex, "created": time.Now().Unix(), "expired": time.Now().Unix() + 30*60})
 	if c3mcommon.CheckError("Insert sessions", err) {
 		return sex
 	}
@@ -49,7 +52,7 @@ func CheckSession(s string) bool {
 	}
 	col := db.Collection("sessions")
 	var result models.Session
-	err2 := col.FindOne(context.TODO(), bson.M{"sex": s}).Decode(&result)
+	err2 := col.FindOne(ctx, bson.M{"sex": s}).Decode(&result)
 
 	if err2 != nil {
 		log.Infof("Session not found sex '%s': %s\n", s, err2)
@@ -58,11 +61,11 @@ func CheckSession(s string) bool {
 			//update session
 			cond := bson.M{"_id": result.ID}
 			change := bson.M{"$set": bson.M{"expired": time.Now().Unix() + 30*60}}
-			col.UpdateOne(context.TODO(), cond, change)
+			col.UpdateOne(ctx, cond, change)
 			return true
 		} else {
 			//remove session
-			col.DeleteOne(context.TODO(), bson.M{"_id": result.ID})
+			col.DeleteOne(ctx, bson.M{"_id": result.ID})
 			log.Infof("Session expired: sex '%s'", s)
 			return false
 		}
@@ -74,16 +77,16 @@ func CheckSession(s string) bool {
 func CheckRequest(uri, useragent, referrer, remoteAddress, requestType string) bool {
 	col := db.Collection("requestUrls")
 	//count same request url in 1 hour, if count>0 => already request => deny
-	urlcount, _ := col.CountDocuments(context.TODO(), bson.M{"uri": uri, "type": requestType, "created": bson.M{"$gt": int(time.Now().Unix()) - 1*3600}})
+	urlcount, _ := col.CountDocuments(ctx, bson.M{"uri": uri, "type": requestType, "created": bson.M{"$gt": int(time.Now().Unix()) - 1*3600}})
 	if urlcount == 0 {
 		//count url request of ip in 3 sec, if this ip request many time (requestlimit) => deny
 		requestlimit, _ := strconv.Atoi(strings.Trim(os.Getenv("REQUEST_LIMIT"), " "))
 		if requestlimit == 0 {
 			requestlimit = 100
 		}
-		urlcount, err := col.CountDocuments(context.TODO(), bson.M{"remoteAddress": remoteAddress, "created": bson.M{"$gt": int(time.Now().Unix()) - 3}})
+		urlcount, err := col.CountDocuments(ctx, bson.M{"remoteAddress": remoteAddress, "created": bson.M{"$gt": int(time.Now().Unix()) - 3}})
 		if urlcount < int64(requestlimit) {
-			_, err = col.InsertOne(context.TODO(), bson.M{"uri": uri, "created": int(time.Now().Unix()), "user-agent": useragent, "referer": referrer, "remoteAddress": remoteAddress, "type": requestType})
+			_, err = col.InsertOne(ctx, bson.M{"uri": uri, "created": int(time.Now().Unix()), "user-agent": useragent, "referer": referrer, "remoteAddress": remoteAddress, "type": requestType})
 			c3mcommon.CheckError("checkRequest Insert", err)
 			return true
 		} else {
