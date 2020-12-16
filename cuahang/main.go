@@ -1,6 +1,7 @@
 package cuahang
 
 import (
+	"context"
 	"encoding/json"
 	"github.com/tidusant/c3m-common/c3mcommon"
 	"github.com/tidusant/c3m-common/log"
@@ -10,13 +11,14 @@ import (
 )
 
 var (
-	db *mongo.Database
+	db  *mongo.Database
+	ctx context.Context
 )
 
 func init() {
 	log.Info("init repo cuahang...")
 	strErr := ""
-	db, strErr = c3mcommon.ConnectAtlasDB("chadmin")
+	db, strErr = c3mcommon.ConnectAtlasDB(ctx, "chadmin")
 	if strErr != "" {
 		log.Infof(strErr)
 		os.Exit(1)

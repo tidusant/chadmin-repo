@@ -1,7 +1,6 @@
 package cuahang
 
 import (
-	"context"
 	"github.com/spf13/viper"
 	"github.com/tidusant/c3m-common/c3mcommon"
 	"github.com/tidusant/c3m-common/log"
@@ -17,7 +16,7 @@ func UpdateTheme(shopid, code string) string {
 	col := db.Collection("addons_shops")
 
 	change := bson.M{"$set": bson.M{"theme": code}}
-	_, err := col.UpdateOne(context.TODO(), bson.M{"_id": shopid}, change)
+	_, err := col.UpdateOne(ctx, bson.M{"_id": shopid}, change)
 	c3mcommon.CheckError("update theme", err)
 
 	return code
@@ -33,7 +32,7 @@ func LoadShopById(session, userid, shopid string) models.Shop {
 		log.Debugf("update login info:shopid %s", shop.ID.Hex())
 		cond := bson.M{"session": session, "userid": bson.ObjectIdHex(userid)}
 		change := bson.M{"$set": bson.M{"shopid": shop.ID.Hex()}}
-		col.UpdateOne(context.TODO(), cond, change)
+		col.UpdateOne(ctx, cond, change)
 	}
 	return shop
 }
@@ -41,7 +40,7 @@ func GetShopDefault(userid string) string {
 	col := db.Collection("addons_shops")
 	var result models.Shop
 
-	col.FindOne(context.TODO(), bson.M{"users": userid}).Decode(&result)
+	col.FindOne(ctx, bson.M{"users": userid}).Decode(&result)
 	if result.Name != "" {
 		return result.ID.Hex()
 	}
@@ -70,7 +69,7 @@ func GetShopById(userid, shopid string) models.Shop {
 	}
 	cond := bson.M{"_id": bson.ObjectIdHex(shopid)}
 	cond["users"] = userid
-	coluser.FindOne(context.TODO(), cond).Decode(&shop)
+	coluser.FindOne(ctx, cond).Decode(&shop)
 	return shop
 }
 func GetShopLimitbyKey(shopid string, key string) int {
@@ -79,7 +78,7 @@ func GetShopLimitbyKey(shopid string, key string) int {
 
 	cond := bson.M{"shopid": shopid, "key": key}
 	var rs models.ShopLimit
-	err := coluser.FindOne(context.TODO(), cond).Decode(&rs)
+	err := coluser.FindOne(ctx, cond).Decode(&rs)
 	c3mcommon.CheckError("GetShopConfigs :", err)
 	return rs.Value
 }
@@ -89,8 +88,8 @@ func GetShopLimits(shopid string) []models.ShopLimit {
 
 	cond := bson.M{"shopid": shopid}
 	var rs []models.ShopLimit
-	cursor, err := coluser.Find(context.TODO(), cond)
-	if err = cursor.All(context.TODO(), &rs); err != nil {
+	cursor, err := coluser.Find(ctx, cond)
+	if err = cursor.All(ctx, &rs); err != nil {
 		c3mcommon.CheckError("Update Error:", err)
 	}
 
@@ -107,8 +106,8 @@ func GetOtherShopById(userid, shopid string) []models.Shop {
 	if userid != "594f665df54c58a2udfl54d3er" && userid != viper.GetString("config.webuserapi") {
 		cond["users"] = userid
 	}
-	cursor, err := coluser.Find(context.TODO(), cond)
-	if err = cursor.All(context.TODO(), &shops); err != nil {
+	cursor, err := coluser.Find(ctx, cond)
+	if err = cursor.All(ctx, &shops); err != nil {
 		c3mcommon.CheckError("Update Error:", err)
 	}
 	return shops
@@ -116,7 +115,7 @@ func GetOtherShopById(userid, shopid string) []models.Shop {
 func GetDemoShop() models.Shop {
 	coluser := db.Collection("addons_shops")
 	var shop models.Shop
-	coluser.FindOne(context.TODO(), bson.M{"name": "demo"}).Decode(&shop)
+	coluser.FindOne(ctx, bson.M{"name": "demo"}).Decode(&shop)
 	return shop
 }
 
@@ -254,8 +253,8 @@ func GetDemoShop() models.Shop {
 func LoadAllShopAlbums(shopid string) []models.ShopAlbum {
 	col := db.Collection("shopalbums")
 	var rs []models.ShopAlbum
-	cursor, err := col.Find(context.TODO(), bson.M{"shopid": shopid})
-	if err = cursor.All(context.TODO(), &rs); err != nil {
+	cursor, err := col.Find(ctx, bson.M{"shopid": shopid})
+	if err = cursor.All(ctx, &rs); err != nil {
 		c3mcommon.CheckError("Update Error:", err)
 	}
 

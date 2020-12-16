@@ -1,7 +1,6 @@
 package cuahang
 
 import (
-	"context"
 	"crypto/md5"
 	"encoding/hex"
 	"go.mongodb.org/mongo-driver/mongo/options"
@@ -22,7 +21,7 @@ Check login status by session and USERIP, return userId and shopid
 func GetUserInfo(UserId string) models.User {
 	col := db.Collection("addons_users")
 	var rs models.User
-	col.FindOne(context.TODO(), bson.M{"_id": bson.ObjectIdHex(UserId)}).Decode(&rs)
+	col.FindOne(ctx, bson.M{"_id": bson.ObjectIdHex(UserId)}).Decode(&rs)
 	return rs
 }
 
@@ -30,19 +29,19 @@ func GetUserInfo(UserId string) models.User {
 func GetLogin(session string) models.UserLogin {
 	coluserlogin := db.Collection("addons_userlogin")
 	var rs models.UserLogin
-	coluserlogin.FindOne(context.TODO(), bson.M{"session": session}).Decode(&rs)
+	coluserlogin.FindOne(ctx, bson.M{"session": session}).Decode(&rs)
 	if rs.ShopId == "" {
 		rs.ShopId = GetShopDefault(rs.UserId.Hex())
 		filter := bson.D{{"userid", rs.UserId}}
 		update := bson.D{{"$set", bson.M{"shopid": rs.ShopId}}}
-		coluserlogin.UpdateOne(context.TODO(), filter, update)
+		coluserlogin.UpdateOne(ctx, filter, update)
 	}
 	return rs
 }
 func UpdateShopLogin(session, ShopChangeId string) (shopchange models.Shop) {
 	coluserlogin := db.Collection("addons_userlogin")
 	var rs models.UserLogin
-	coluserlogin.FindOne(context.TODO(), bson.M{"session": session}).Decode(&rs)
+	coluserlogin.FindOne(ctx, bson.M{"session": session}).Decode(&rs)
 	if rs.UserId.Hex() == "" {
 		return shopchange
 	}
@@ -56,7 +55,7 @@ func UpdateShopLogin(session, ShopChangeId string) (shopchange models.Shop) {
 
 	filter := bson.D{{"userid", rs.UserId}}
 	update := bson.D{{"$set", bson.M{"shopid": rs.ShopId}}}
-	coluserlogin.UpdateOne(context.TODO(), filter, update)
+	coluserlogin.UpdateOne(ctx, filter, update)
 	return shopchange
 }
 
@@ -66,12 +65,12 @@ func Login(user, pass, session, userIP string) bool {
 	passmd5 := hex.EncodeToString(hash[:])
 	coluser := db.Collection("addons_users")
 	var result models.User
-	coluser.FindOne(context.TODO(), bson.M{"user": user, "password": passmd5}).Decode(&result)
+	coluser.FindOne(ctx, bson.M{"user": user, "password": passmd5}).Decode(&result)
 	log.Debugf("user result %v", result)
 	if result.Name != "" {
 		coluserlogin := db.Collection("addons_userlogin")
 		var userlogin models.UserLogin
-		coluserlogin.FindOne(context.TODO(), bson.M{"userid": result.ID}).Decode(&userlogin)
+		coluserlogin.FindOne(ctx, bson.M{"userid": result.ID}).Decode(&userlogin)
 		if userlogin.UserId.Hex() == "" {
 			userlogin.UserId = result.ID
 		}
@@ -83,7 +82,7 @@ func Login(user, pass, session, userIP string) bool {
 		filter := bson.D{{"userid", userlogin.UserId}}
 		update := bson.D{{"$set", userlogin}}
 
-		_, err := coluserlogin.UpdateOne(context.TODO(), filter, update, opts)
+		_, err := coluserlogin.UpdateOne(ctx, filter, update, opts)
 		c3mcommon.CheckError("Upsert login", err)
 		return true
 	}
@@ -92,7 +91,7 @@ func Login(user, pass, session, userIP string) bool {
 func Logout(session string) string {
 
 	col := db.Collection("addons_userlogin")
-	col.DeleteOne(context.TODO(), bson.M{"session": session})
+	col.DeleteOne(ctx, bson.M{"session": session})
 
 	return ""
 }
