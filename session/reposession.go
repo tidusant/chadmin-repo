@@ -26,7 +26,7 @@ var (
 func init() {
 	fmt.Print("init repo session...")
 	strErr := ""
-	ctx, cancel = context.WithCancel(context.Background())
+	ctx = context.Background()
 	db, strErr = c3mcommon.ConnectAtlasDB(ctx, "session")
 	if strErr != "" {
 		log.Infof(strErr)
@@ -86,6 +86,7 @@ func CheckRequest(uri, useragent, referrer, remoteAddress, requestType string) b
 		}
 		urlcount, err := col.CountDocuments(ctx, bson.M{"remoteAddress": remoteAddress, "created": bson.M{"$gt": int(time.Now().Unix()) - 3}})
 		if urlcount < int64(requestlimit) {
+			log.Debugf("check request %s", uri)
 			_, err = col.InsertOne(ctx, bson.M{"uri": uri, "created": int(time.Now().Unix()), "user-agent": useragent, "referer": referrer, "remoteAddress": remoteAddress, "type": requestType})
 			c3mcommon.CheckError("checkRequest Insert", err)
 			return true
