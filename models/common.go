@@ -1,8 +1,8 @@
 package models
 
 type RequestResult struct {
-	Status  string          `json:"status"`
-	Error   string          `json:"error"`
-	Message string          `json:"message"`
-	Data    string `json:"data"`
+	Status  int    `default:0`
+	Error   string `default:"something wrong"`
+	Message string `default:""`
+	Data    string
 }

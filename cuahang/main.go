@@ -18,6 +18,10 @@ var (
 func init() {
 	log.Info("init repo cuahang...")
 	strErr := ""
+	ctx = context.Background()
+	context.WithValue(ctx, 43, 44)
+	u, ok := ctx.Value(43).(int64)
+	log.Debugf("context:%v - %v", u, ok)
 	db, strErr = c3mcommon.ConnectAtlasDB(ctx, "chadmin")
 	if strErr != "" {
 		log.Infof(strErr)

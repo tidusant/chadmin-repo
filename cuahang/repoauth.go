@@ -64,8 +64,11 @@ func Login(user, pass, session, userIP string) bool {
 	hash := md5.Sum([]byte(pass))
 	passmd5 := hex.EncodeToString(hash[:])
 	coluser := db.Collection("addons_users")
+	u, ok := ctx.Value(43).(int64)
+	log.Debugf("context:%v - %v", u, ok)
 	var result models.User
-	coluser.FindOne(ctx, bson.M{"user": user, "password": passmd5}).Decode(&result)
+	err := coluser.FindOne(ctx, bson.M{"user": user, "password": passmd5}).Decode(&result)
+	c3mcommon.CheckError("error query user", err)
 	log.Debugf("user result %v", result)
 	if result.Name != "" {
 		coluserlogin := db.Collection("addons_userlogin")
@@ -79,8 +82,12 @@ func Login(user, pass, session, userIP string) bool {
 		userlogin.Session = session
 
 		opts := options.Update().SetUpsert(true)
-		filter := bson.D{{"userid", userlogin.UserId}}
-		update := bson.D{{"$set", userlogin}}
+		filter := bson.M{"userid": userlogin.UserId}
+		update := bson.M{"$set": bson.M{
+			"last":    userlogin.LastLogin,
+			"id":      userlogin.LoginIP,
+			"session": userlogin.Session,
+		}}
 
 		_, err := coluserlogin.UpdateOne(ctx, filter, update, opts)
 		c3mcommon.CheckError("Upsert login", err)

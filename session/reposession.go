@@ -33,6 +33,11 @@ func init() {
 		os.Exit(1)
 	}
 	fmt.Print("done\n")
+	sex := mystring.RandString(20)
+	col := db.Collection("sessions")
+	_, err := col.InsertOne(ctx, bson.M{"sex": sex, "created": time.Now().Unix(), "expired": time.Now().Unix() + 30*60})
+	c3mcommon.CheckError("Insert sessions", err)
+	fmt.Printf("test session: %s", CreateSession())
 
 }
 
