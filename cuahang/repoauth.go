@@ -9,19 +9,19 @@ import (
 	"github.com/tidusant/c3m-common/log"
 	"github.com/tidusant/chadmin-repo/models"
 
-	"time"
-
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"gopkg.in/mgo.v2/bson"
+	"time"
 )
 
 /*
 Check login status by session and USERIP, return userId and shopid
 */
 
-func GetUserInfo(UserId string) models.User {
+func GetUserInfo(UserId primitive.ObjectID) models.User {
 	col := db.Collection("addons_users")
 	var rs models.User
-	col.FindOne(ctx, bson.M{"_id": bson.ObjectIdHex(UserId)}).Decode(&rs)
+	col.FindOne(ctx, bson.M{"_id": UserId}).Decode(&rs)
 	return rs
 }
 
@@ -30,32 +30,36 @@ func GetLogin(session string) models.UserLogin {
 	coluserlogin := db.Collection("addons_userlogin")
 	var rs models.UserLogin
 	coluserlogin.FindOne(ctx, bson.M{"session": session}).Decode(&rs)
-	if rs.ShopId == "" {
-		rs.ShopId = GetShopDefault(rs.UserId.Hex())
+	if rs.ShopId == primitive.NilObjectID {
+		rs.ShopId = GetShopDefault(rs.UserId)
 		filter := bson.D{{"userid", rs.UserId}}
 		update := bson.D{{"$set", bson.M{"shopid": rs.ShopId}}}
 		coluserlogin.UpdateOne(ctx, filter, update)
 	}
 	return rs
 }
-func UpdateShopLogin(session, ShopChangeId string) (shopchange models.Shop) {
+func UpdateShopLogin(session string, ShopChangeId primitive.ObjectID) (shopchange models.Shop) {
 	coluserlogin := db.Collection("addons_userlogin")
 	var rs models.UserLogin
-	coluserlogin.FindOne(ctx, bson.M{"session": session}).Decode(&rs)
+	err := coluserlogin.FindOne(ctx, bson.M{"session": session}).Decode(&rs)
+	log.Debugf("query user %s,%s, %v,%s", rs.Session, rs.ID, rs.ShopId, rs.UserId)
+	c3mcommon.CheckError("Error query Session in UpdateShopLogin", err)
 	if rs.UserId.Hex() == "" {
 		return shopchange
 	}
 	//get shop id
 
-	shopchange = GetShopById(rs.UserId.Hex(), ShopChangeId)
-	if shopchange.ID.Hex() == "" {
+	shopchange = GetShopById(rs.UserId, ShopChangeId)
+	if shopchange.ID == primitive.NilObjectID {
 		return shopchange
 	}
-	rs.ShopId = shopchange.ID.Hex()
+	rs.ShopId = shopchange.ID
 
-	filter := bson.D{{"userid", rs.UserId}}
-	update := bson.D{{"$set", bson.M{"shopid": rs.ShopId}}}
-	coluserlogin.UpdateOne(ctx, filter, update)
+	log.Debugf("shopid:%s", rs.ShopId)
+	filter := bson.M{"_id": rs.ID}
+	update := bson.M{"$set": bson.M{"shopid": rs.ShopId}}
+	_, err = coluserlogin.UpdateOne(ctx, filter, update)
+	c3mcommon.CheckError("Error update Session in UpdateShopLogin", err)
 	return shopchange
 }
 

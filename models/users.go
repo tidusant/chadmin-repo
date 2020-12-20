@@ -1,27 +1,26 @@
 package models
 
 import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
-
-	"gopkg.in/mgo.v2/bson"
 )
 
 type UserSession struct {
 	Session string
-	UserID  string
+	UserID  primitive.ObjectID
 	Action  string
 	Params  string
 	Shop    Shop
 	UserIP  string
 }
 type User struct {
-	ID     bson.ObjectId `bson:"_id,omitempty"`
-	User   string        `bson:"user"`
-	Name   string        `bson:"name"`
-	Email  string        `bson:"email"`
-	Active int32         `bson:"active"`
-	Group  string        `bson:"group"`
-	Config UserConfig    `bson:"config"`
+	ID     primitive.ObjectID `bson:"_id,omitempty"`
+	User   string             `bson:"user"`
+	Name   string             `bson:"name"`
+	Email  string             `bson:"email"`
+	Active int32              `bson:"active"`
+	Group  string             `bson:"group"`
+	Config UserConfig         `bson:"config"`
 }
 
 type UserConfig struct {
@@ -30,10 +29,10 @@ type UserConfig struct {
 }
 
 type UserLogin struct {
-	ID        bson.ObjectId `bson:"_id,omitempty"`
-	UserId    bson.ObjectId `bson:"userid"`
-	ShopId    string        `bson:"shopid"`
-	Session   string        `bson:"session"`
-	LastLogin time.Time     `bson:"last"`
-	LoginIP   string        `bson:"ip"`
+	ID        primitive.ObjectID `bson:"_id,omitempty"`
+	UserId    primitive.ObjectID `bson:"userid"`
+	ShopId    primitive.ObjectID `bson:"shopid"`
+	Session   string             `bson:"session"`
+	LastLogin time.Time          `bson:"last"`
+	LoginIP   string             `bson:"ip"`
 }

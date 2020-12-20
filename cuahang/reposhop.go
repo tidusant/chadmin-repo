@@ -1,10 +1,11 @@
 package cuahang
 
 import (
-	"github.com/spf13/viper"
+	//"github.com/spf13/viper"
 	"github.com/tidusant/c3m-common/c3mcommon"
 	"github.com/tidusant/c3m-common/log"
 	"github.com/tidusant/chadmin-repo/models"
+	"go.mongodb.org/mongo-driver/bson/primitive" // for BSON ObjectID
 	"gopkg.in/mgo.v2/bson"
 )
 
@@ -21,28 +22,29 @@ func UpdateTheme(shopid, code string) string {
 
 	return code
 }
-func LoadShopById(session, userid, shopid string) models.Shop {
+func LoadShopById(session string, userid, shopid primitive.ObjectID) models.Shop {
 	col := db.Collection("addons_userlogin")
-	if shopid == "" {
+	if shopid == primitive.NilObjectID {
 		//get first shop
 		shopid = GetShopDefault(userid)
 	}
+
 	shop := GetShopById(userid, shopid)
 	if shop.Name != "" {
-		log.Debugf("update login info:shopid %s", shop.ID.Hex())
-		cond := bson.M{"session": session, "userid": bson.ObjectIdHex(userid)}
-		change := bson.M{"$set": bson.M{"shopid": shop.ID.Hex()}}
+		log.Debugf("update login info:shopid %s", shop.ID)
+		cond := bson.M{"session": session, "userid": userid}
+		change := bson.M{"$set": bson.M{"shopid": shop.ID}}
 		col.UpdateOne(ctx, cond, change)
 	}
 	return shop
 }
-func GetShopDefault(userid string) string {
+func GetShopDefault(userid primitive.ObjectID) primitive.ObjectID {
 	col := db.Collection("addons_shops")
 	var result models.Shop
 
 	col.FindOne(ctx, bson.M{"users": userid}).Decode(&result)
 	if result.Name != "" {
-		return result.ID.Hex()
+		return result.ID
 	}
 
 	//pipeline := []bson.M{{"$match": bson.M{"name": "abc"}}}
@@ -59,20 +61,28 @@ func GetShopDefault(userid string) string {
 	//	if len(result) > 0 {
 	//		return result[0].ID.Hex()
 	//	}
-	return ""
+	return primitive.NilObjectID
 }
-func GetShopById(userid, shopid string) models.Shop {
+func GetShopById(userid, shopid primitive.ObjectID) models.Shop {
 	coluser := db.Collection("addons_shops")
 	var shop models.Shop
-	if shopid == "" {
+	if shopid == primitive.NilObjectID {
 		return shop
 	}
-	cond := bson.M{"_id": bson.ObjectIdHex(shopid)}
+	// Create a BSON ObjectID by passing string to ObjectIDFromHex() method
+	//shopidObj,_ := primitive.ObjectIDFromHex(shopid)
+	//useridObj:= bson.ObjectIdHex(userid)
+
+	cond := bson.M{"_id": shopid}
+	//cond := bson.M{"users": userid}
 	cond["users"] = userid
-	coluser.FindOne(ctx, cond).Decode(&shop)
+	log.Debugf("condition query user %v,%s, %v", cond, userid, shopid)
+
+	err := coluser.FindOne(ctx, cond).Decode(&shop)
+	c3mcommon.CheckError("Error query shop in GetShopById", err)
 	return shop
 }
-func GetShopLimitbyKey(shopid string, key string) int {
+func GetShopLimitbyKey(shopid primitive.ObjectID, key string) int {
 
 	coluser := db.Collection("shoplimits")
 
@@ -82,7 +92,7 @@ func GetShopLimitbyKey(shopid string, key string) int {
 	c3mcommon.CheckError("GetShopConfigs :", err)
 	return rs.Value
 }
-func GetShopLimits(shopid string) []models.ShopLimit {
+func GetShopLimits(shopid primitive.ObjectID) []models.ShopLimit {
 
 	coluser := db.Collection("shoplimits")
 
@@ -95,17 +105,17 @@ func GetShopLimits(shopid string) []models.ShopLimit {
 
 	return rs
 }
-func GetOtherShopById(userid, shopid string) []models.Shop {
+func GetOtherShopById(userid, shopid primitive.ObjectID) []models.Shop {
 	coluser := db.Collection("addons_shops")
 	var shops []models.Shop
-	if shopid == "" {
+	if shopid == primitive.NilObjectID {
 		return shops
 	}
-	cond := bson.M{"_id": bson.M{"$ne": bson.ObjectIdHex(shopid)}}
+	cond := bson.M{"_id": bson.M{"$ne": shopid}}
 
-	if userid != "594f665df54c58a2udfl54d3er" && userid != viper.GetString("config.webuserapi") {
-		cond["users"] = userid
-	}
+	//if userid != "594f665df54c58a2udfl54d3er" && userid != viper.GetString("config.webuserapi") {
+	cond["users"] = userid
+	//}
 	cursor, err := coluser.Find(ctx, cond)
 	if err = cursor.All(ctx, &shops); err != nil {
 		c3mcommon.CheckError("Update Error:", err)
