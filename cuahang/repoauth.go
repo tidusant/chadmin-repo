@@ -29,12 +29,17 @@ func GetUserInfo(UserId primitive.ObjectID) models.User {
 func GetLogin(session string) models.UserLogin {
 	coluserlogin := db.Collection("addons_userlogin")
 	var rs models.UserLogin
-	coluserlogin.FindOne(ctx, bson.M{"session": session}).Decode(&rs)
-	if rs.ShopId == primitive.NilObjectID {
-		rs.ShopId = GetShopDefault(rs.UserId)
-		filter := bson.D{{"userid", rs.UserId}}
-		update := bson.D{{"$set", bson.M{"shopid": rs.ShopId}}}
-		coluserlogin.UpdateOne(ctx, filter, update)
+	cond := bson.M{"session": session}
+	log.Debugf("cond getlogin:%+v", cond)
+	err := coluserlogin.FindOne(ctx, cond).Decode(&rs)
+	if c3mcommon.CheckError("Error GetLogin", err) {
+		if rs.ShopId == primitive.NilObjectID {
+			rs.ShopId = GetShopDefault(rs.UserId)
+			log.Debugf("GetLogin Shopid", rs.ShopId)
+			filter := bson.D{{"userid", rs.UserId}}
+			update := bson.D{{"$set", bson.M{"shopid": rs.ShopId}}}
+			coluserlogin.UpdateOne(ctx, filter, update)
+		}
 	}
 	return rs
 }
@@ -64,12 +69,12 @@ func UpdateShopLogin(session string, ShopChangeId primitive.ObjectID) (shopchang
 }
 
 //Login user and update session
-func Login(user, pass, session, userIP string) bool {
+func Login(user, pass, session, userIP string) models.User {
 	hash := md5.Sum([]byte(pass))
 	passmd5 := hex.EncodeToString(hash[:])
 	coluser := db.Collection("addons_users")
-	u, ok := ctx.Value(43).(int64)
-	log.Debugf("context:%v - %v", u, ok)
+
+	log.Debugf("login:%s - %s", user, passmd5)
 	var result models.User
 	err := coluser.FindOne(ctx, bson.M{"user": user, "password": passmd5}).Decode(&result)
 	c3mcommon.CheckError("error query user", err)
@@ -95,9 +100,9 @@ func Login(user, pass, session, userIP string) bool {
 
 		_, err := coluserlogin.UpdateOne(ctx, filter, update, opts)
 		c3mcommon.CheckError("Upsert login", err)
-		return true
+
 	}
-	return false
+	return result
 }
 func Logout(session string) string {
 

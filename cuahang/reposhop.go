@@ -89,7 +89,7 @@ func GetShopLimitbyKey(shopid primitive.ObjectID, key string) int {
 	cond := bson.M{"shopid": shopid, "key": key}
 	var rs models.ShopLimit
 	err := coluser.FindOne(ctx, cond).Decode(&rs)
-	c3mcommon.CheckError("GetShopConfigs :", err)
+	c3mcommon.CheckError("GetShopLimitbyKey :", err)
 	return rs.Value
 }
 func GetShopLimits(shopid primitive.ObjectID) []models.ShopLimit {
@@ -111,15 +111,19 @@ func GetOtherShopById(userid, shopid primitive.ObjectID) []models.Shop {
 	if shopid == primitive.NilObjectID {
 		return shops
 	}
+
 	cond := bson.M{"_id": bson.M{"$ne": shopid}}
 
 	//if userid != "594f665df54c58a2udfl54d3er" && userid != viper.GetString("config.webuserapi") {
 	cond["users"] = userid
+
+	log.Debugf("GetOtherShopById %v %v", cond)
 	//}
 	cursor, err := coluser.Find(ctx, cond)
 	if err = cursor.All(ctx, &shops); err != nil {
-		c3mcommon.CheckError("Update Error:", err)
+		c3mcommon.CheckError("GetOtherShopById", err)
 	}
+	log.Debugf("GetOtherShopById %v ", shops)
 	return shops
 }
 func GetDemoShop() models.Shop {

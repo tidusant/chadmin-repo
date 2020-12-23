@@ -3,32 +3,31 @@ package cuahang
 import (
 	"github.com/tidusant/c3m-common/c3mcommon"
 
-	"context"
 	"github.com/tidusant/chadmin-repo/models"
+	"go.mongodb.org/mongo-driver/bson/primitive"
+	"gopkg.in/mgo.v2/bson"
 	"log"
 	"time"
-
-	"gopkg.in/mgo.v2/bson"
 )
 
-func GetAllCampaigns(shopid string) []models.Campaign {
+func GetAllCampaigns(shopid primitive.ObjectID) []models.Campaign {
 	col := db.Collection("addons_campaigns")
 	var rs []models.Campaign
-	cond := bson.M{"shopid": shopid}
-	cursor, err := col.Find(context.TODO(), cond)
-	if err = cursor.All(context.TODO(), &rs); err != nil {
+	cond := bson.M{"shopid": shopid.Hex()}
+	cursor, err := col.Find(ctx, cond)
+	if err = cursor.All(ctx, &rs); err != nil {
 		log.Fatal(err)
 	}
 	c3mcommon.CheckError("Getall campaign", err)
 	return rs
 }
 
-func GetCampaignsByRange(shopid string, start time.Time, end time.Time) []models.Campaign {
+func GetCampaignsByRange(shopid primitive.ObjectID, start time.Time, end time.Time) []models.Campaign {
 	col := db.Collection("addons_campaigns")
 	var rs []models.Campaign
-	cond := bson.M{"shopid": shopid, "start": bson.M{"$lt": end}, "end": bson.M{"$gt": start}}
-	cursor, err := col.Find(context.TODO(), cond)
-	if err = cursor.All(context.TODO(), &rs); err != nil {
+	cond := bson.M{"shopid": shopid.Hex(), "start": bson.M{"$lt": end}, "end": bson.M{"$gt": start}}
+	cursor, err := col.Find(ctx, cond)
+	if err = cursor.All(ctx, &rs); err != nil {
 		log.Fatal(err)
 	}
 	c3mcommon.CheckError("Getall campaign by range", err)
@@ -40,8 +39,8 @@ func GetCampaignsByRange(shopid string, start time.Time, end time.Time) []models
 //	col := db.Collection("addons_campaigns")
 //	var rs models.Campaign
 //	cond := bson.M{"shopid": shopid, "_id": bson.ObjectIdHex(ID)}
-//	cursor,err := col.Find(context.TODO(),cond)
-//	if err = cursor.All(context.TODO(), &rs); err != nil {     log.Fatal(err) }
+//	cursor,err := col.Find(ctx,cond)
+//	if err = cursor.All(ctx, &rs); err != nil {     log.Fatal(err) }
 //	c3mcommon.CheckError("Get campaign by id", err)
 //	return rs
 //}
@@ -60,8 +59,8 @@ func GetCampaignsByRange(shopid string, start time.Time, end time.Time) []models
 //	var ords []models.Order
 //	cond := bson.M{"shopid": shopid, "campaignid": camp.ID.Hex()}
 //
-//	cursor,err := col.Find(context.TODO(),cond)
-//	if err = cursor.All(context.TODO(), &rs); err != nil {     log.Fatal(err) }
+//	cursor,err := col.Find(ctx,cond)
+//	if err = cursor.All(ctx, &rs); err != nil {     log.Fatal(err) }
 //
 //	stats := GetAllOrderStatus(shopid)
 //	statsmap := make(map[string]models.OrderStatus)
@@ -107,12 +106,12 @@ func GetCampaignsByRange(shopid string, start time.Time, end time.Time) []models
 //	filter := bson.D{{"_id", camp.ID}}
 //	update := bson.D{{"$set", camp}}
 //
-//	col.UpdateOne(context.TODO(),filter, update,opts)
+//	col.UpdateOne(ctx,filter, update,opts)
 //	return camp
 //}
 //func DeleteCampaign(camp models.Campaign) bool {
 //	col := db.Collection("addons_campaigns")
-//	_,err := col.DeleteOne(context.TODO(),camp)
+//	_,err := col.DeleteOne(ctx,camp)
 //	return c3mcommon.CheckError("Delete campaign", err)
 //
 //}

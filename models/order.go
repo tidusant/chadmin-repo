@@ -1,16 +1,14 @@
 package models
 
 import (
-	"time"
-
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Order struct {
-	ID             bson.ObjectId `bson:"_id,omitempty"`
-	ShopId         string        `bson:"shopid"`
-	EmployeeId     string        `bson:"employeeid"`
-	CampaignId     string        `bson:"campaignid"`
+	ID             primitive.ObjectID `bson:"_id,omitempty"`
+	ShopId         string             `bson:"shopid"`
+	EmployeeId     string             `bson:"employeeid"`
+	CampaignId     string             `bson:"campaignid"`
 	CampaignName   string
 	ShipperId      string `bson:"shipperid"`
 	ShipmentCode   string `bson:"shipmentcode"`
@@ -52,16 +50,16 @@ type OrderItem struct {
 }
 
 type OrderStatus struct {
-	ID            bson.ObjectId `bson:"_id,omitempty"`
-	Title         string        `bson:"title"`
-	Default       bool          `bson:"default"`
-	Finish        bool          `bson:"finish"`
-	Export        bool          `bson:"export"`
-	UserId        string        `bson:"userid"`
-	ShopId        string        `bson:"shopid"`
-	Created       time.Time     `bson:"created"`
-	Modified      time.Time     `bson:"modified"`
-	Color         string        `bson:"color"`
+	ID      primitive.ObjectID `bson:"_id,omitempty"`
+	Title   string             `bson:"title"`
+	Default bool               `bson:"default"`
+	Finish  bool               `bson:"finish"`
+	Export  bool               `bson:"export"`
+	UserId  string             `bson:"userid"`
+	ShopId  string             `bson:"shopid"`
+	//Created       time.Time     `bson:"created"`
+	//Modified      time.Time     `bson:"modified"`
+	Color         string `bson:"color"`
 	OrderCount    int
 	PartnerStatus map[string][]string `bson:partnerstatus`
 }

@@ -1,13 +1,12 @@
 package models
 
 import (
+	"go.mongodb.org/mongo-driver/bson/primitive"
 	"time"
-
-	"gopkg.in/mgo.v2/bson"
 )
 
 type Product struct {
-	ID         bson.ObjectId           `bson:"_id,omitempty"`
+	ID         primitive.ObjectID      `bson:"_id,omitempty"`
 	Code       string                  `bson:"code"`
 	UserId     string                  `bson:"userid"`
 	ShopId     string                  `bson:"shopid"`
@@ -50,7 +49,7 @@ type ProductLang struct {
 }
 
 type ProdCat struct {
-	ID        bson.ObjectId        `bson:"_id,omitempty"`
+	ID        primitive.ObjectID   `bson:"_id,omitempty"`
 	Code      string               `bson:"code"`
 	UserId    string               `bson:"userid"`
 	ShopId    string               `bson:"shopid"`

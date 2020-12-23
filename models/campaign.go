@@ -3,20 +3,20 @@ package models
 import (
 	"time"
 
-	"gopkg.in/mgo.v2/bson"
+	"go.mongodb.org/mongo-driver/bson/primitive"
 )
 
 type Campaign struct {
-	ID             bson.ObjectId `bson:"_id,omitempty"`
-	ShopId         string        `bson:"shopid"`
-	Name           string        `bson:"name"`
-	Description    string        `bson:"description"`
-	Bugget         int           `bson:"bugget"`
-	UserId         string        `bson:"userid"`
-	Created        time.Time     `bson:"created"`
-	Modified       time.Time     `bson:"modified"`
-	Start          time.Time     `bson:"start"`
-	End            time.Time     `bson:"end"`
+	ID          primitive.ObjectID `bson:"_id,omitempty"`
+	ShopId      string             `bson:"shopid"`
+	Name        string             `bson:"name"`
+	Description string             `bson:"description"`
+	Bugget      int                `bson:"bugget"`
+	UserId      string             `bson:"userid"`
+	//Created        time.Time     `bson:"created"`
+	//Modified       time.Time     `bson:"modified"`
+	Start          time.Time `bson:"start"`
+	End            time.Time `bson:"end"`
 	Noo            int
 	Total          int
 	Base           int
